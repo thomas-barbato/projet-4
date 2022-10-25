@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+/projet-4/model/db_chess.json
+/model/db_chess.json

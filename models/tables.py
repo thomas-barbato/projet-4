@@ -8,21 +8,17 @@ db = TinyDB("db_chess.json")
 class Player:
     def __init__(
         self,
-        last_name: str,
-        first_name: str,
-        date_of_birth: str,
-        gender: str,
-        age: int,
-        ranking: int,
+        data: dict
     ):
-        self.last_name: str = last_name
-        self.first_name: str = first_name
-        self.date_of_birth: str = date_of_birth
-        self.gender: str = gender
-        self.age: str = age
-        self.ranking: int = ranking
+        self.last_name: str = data['last_name']
+        self.first_name: str = data['first_name']
+        self.date_of_birth: str = data['date_of_birth']
+        self.gender: str = data['gender']
+        self.age: int = data['age']
+        self.ranking: int = data['ranking']
         self.players_table: str = db.table("players")
         self.serialized_players: dict = {
+            "id": len(self.players_table),
             "last_name": self.last_name,
             "first_name": self.first_name,
             "date_of_birth": self.date_of_birth,
@@ -53,27 +49,22 @@ class TimeController(Enum):
 class Tournament:
     def __init__(
         self,
-        name: str,
-        location: str,
-        date: str,
-        number_of_turn: int,
-        players: list,
-        time_controller: str,
-        description: str = "",
+        data: dict,
     ):
-        self.name = name
-        self.location = location
-        self.date = date
-        self.number_of_turn = number_of_turn
-        self.players = players
-        self.time_controller = (
-            time_controller
-            if time_controller in TimeController._value2member_map_
+        self.name: str = data['name']
+        self.location: str = data['location']
+        self.date: str = data['date']
+        self.number_of_turn: int = data['number_of_turn']
+        self.players: dict = data['players']
+        self.time_controller: str = (
+            data['time_controller']
+            if data['time_controller'] in TimeController._value2member_map_
             else "Empty"
         )
-        self.description = description
+        self.description: str = data[' description']
         self.tournaments_table: str = db.table("tournaments")
         self.serialized_tournaments: dict = {
+            "id": len(self.tournaments_table),
             "name": self.name,
             "location": self.location,
             "date": self.date,
@@ -96,13 +87,12 @@ class Tournament:
         db.table("tournaments").truncate()
 
 
-x = Player("a", "b", "10/09/1989", "male", 15, 3)
+
+x = Player({"first_name": "a", "last_name": "b", "date_of_birth": "10/09/1989", "gender": "male", "age":15, "ranking": 3})
 x.save()
-x = Player("x", "e", "12/03/1983", "male", 22, 2)
+x = Player({"first_name": "sqxsxqs", "last_name": "dddddd", "date_of_birth": "01/12/1989", "gender": "male", "age":27, "ranking": 4})
 x.save()
 
-print(x.display_data())
-print(x.clear_table())
 print(x.display_data())
 
 # check if "blitz" is in TimeController
