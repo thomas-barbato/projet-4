@@ -393,8 +393,9 @@ class Menu:
             elif response.lower() == "o":
                 tournament = Tournament(self.tournament_data)
                 tournament.save()
-                print("tournois bien sauvegardé")
-                break
+                self.console.print("\n[bold]Le tournoi a été correctement sauvegardé, vous allez être redirigé vers le menu principal.[/bold]")
+                self.__clear_screen(1)
+                return self.display_main_menu()
             elif response.lower() == "n":
                 self.__clear_screen(0)
                 return self.display_main_menu()
