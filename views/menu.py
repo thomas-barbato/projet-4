@@ -2,34 +2,24 @@
 import os
 import sys
 import re
-from time import sleep
-import datetime
-
-from rich import (
-    print,
-)
-from rich import (
-    pretty,
-)
-from rich.console import (
-    Console,
-)
-from rich.panel import (
-    Panel,
-)
-from rich.table import Table
-from rich import box
 
 PROJECT_CWD = f"{os.sep}".join(os.getcwd().split(os.sep)[:-1])
 sys.path.append(PROJECT_CWD)
-sys.path.append(os.path.join(PROJECT_CWD, "controllers"))
-from controllers.engine import Engine
-from models.tables import TimeController, Tournament, Player
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(ROOT_DIR, "controllers"))
+from time import sleep
+import datetime
+from controllers.engine import Controller
+from models.tables import Tournament, Player
+from rich import pretty, print
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
 
 
 class Menu:
     """_Menu_
-    display website frontend
+    display frontend
     """
 
     def __init__(
@@ -38,11 +28,10 @@ class Menu:
         pretty.install()
         self.console = Console(width=100)
         self.menu_choices: int = 0
-        self.time_controller = Engine()
-        self.tournament_data: dict = {}
-        self.player_data: dict = {}
+        self.controller_data: Controller =  Controller()
+        self.display_main_menu()
 
-    def __clear_screen(self, sleep_val: int = 0):
+    def _clear_screen(self, sleep_val: int = 0):
         """_clear_screen_
         Args:
             sleep_val (int, optional): _sleep_val_. Defaults to 0.
@@ -51,7 +40,7 @@ class Menu:
         sleep(sleep_val)
         return os.system("cls")
 
-    def __exit(self, sleep_val: int = 0):
+    def _exit(self, sleep_val: int = 0):
         """_exit_
         Args:
             sleep_val (int, optional): _description_. Defaults to 0.
@@ -67,99 +56,41 @@ class Menu:
         """
         return self.menu_choices
 
-    def __return_msg_error(self, category: str):
+    def _return_msg_error(self, category: str):
         """_return_msg_error_
         Args:
             category (str): _description_
         show error msg.
         """
-        if category == "main_choice_value":
-            self.console.print(
-                "[italic red]Veuillez entrer une valeur numérique comprise entre 1 et 5...\n[/italic red]\n"
-            )
-        elif category == "main_choice_type":
-            self.console.print("[italic red]Veuillez entrer une valeur numérique...\n[/italic red]\n")
-        elif category == "wrong_input_choice_to_continue":
-            self.console.print(
-                "[italic red]Appuyez sur [/italic red][bold]'o'[/bold][italic red] pour continuer ou"
-                "[/italic red][bold green] 'n'[/bold green][italic red] pour revenir au menu principal[/italic red]\n"
-            )
-        elif category == "empty_field":
-            self.console.print("[italic red]Veuillez renseigner ce champ[/italic red]")
-        elif category == "date_format":
-            self.console.print(
-                "[italic red]Format de date incorrect, format attendu: jj-mm-aaaa hh:mm\nExemple: "
-                "[bold]10-09-2022 10:30[/bold][/italic red]\n"
-            )
-        elif category == "wrong_turn_type_entry":
-            self.console.print(
-                "[italic red]Veuillez entrer une valeur correcte, format attendu: "
-                "[bold]un entier positif superieur à 0[/bold][/italic red]\n"
-            )
-        elif category == "time_controller_field":
-            self.console.print(
-                "[italic red]Veuillez entrer une valeur correcte, choix attendu:"
-                "[bold]blitz[/bold] ou [bold]bullet[/bold] ou [bold]coup_rapide[/bold][/italic red]\n"
-            )
-        elif category == "no_player_created":
-            self.console.print(
-                "[italic red]Veuillez inscrire des joueurs avant de pouvoir les assigner à un tournoi.[/bold][/italic red]"
-                "\n\n[bold]Vous allez être redirigé vers la page d'inscription de nouveaux joueurs.[/bold]"
-            )
-        elif category == "too_few_player_created":
-            self.console.print(
-                "[italic red]Veuillez d'abord inscrire au moins[bold] 8 joueurs[/bold] afin de pouvoir les assigner à un tournois[/italic red]"
-                "\n\n[bold]Vous allez être redirigé vers la page d'inscription de nouveaux joueurs.[/bold]"
-            )
-        elif category == "wrong_player_number_selected":
-            self.console.print("[italic red]Veuillez selectionner[bold] 8 joueurs[/bold][/italic red]")
-        elif category == "wrong_input_choice_to_save":
-            self.console.print(
-                "[italic red]Appuyez sur [/italic red][bold]'o'[/bold][italic red] pour sauvegarder ou"
-                "[/italic red][bold]'n'[/bold][italic red] pour annuler et revenir au menu principal[/italic red]\n"
-            )
+        return {
+            "main_choice_value": "[italic red]Veuillez entrer une valeur numérique comprise entre 1 et 5...\n[/italic red]\n",
+            "main_choice_type": "[italic red]Veuillez entrer une valeur numérique...\n[/italic red]\n",
+            "wrong_input_choice_to_continue":"[italic red]Appuyez sur [/italic red][bold]'o'[/bold][italic red] pour continuer ou"\
+                "[/italic red][bold green] 'n'[/bold green][italic red] pour revenir au menu principal[/italic red]\n",
+            "empty_field": "[italic red]Veuillez renseigner ce champ[/italic red]",
+            "date_format": "[italic red]Format de date incorrect, format attendu: jj-mm-aaaa hh:mm\nExemple: "\
+                "[bold]10-09-2022 10:30[/bold][/italic red]\n",
+            "wrong_turn_type_entry": "[italic red]Veuillez entrer une valeur correcte, format attendu: "\
+                "[bold]un entier positif superieur à 0[/bold][/italic red]\n",
+            "time_controller_field":  "[italic red]Veuillez entrer une valeur correcte, choix attendu:"\
+                "[bold] blitz[/bold] ou [bold]bullet[/bold] ou [bold]coup_rapide[/bold][/italic red]\n",
+            "no_player_created": "[italic red]\n\nVous n'avez pas encore inscrit de joueur.[/bold][/italic red]"\
+                "\n\n[bold]Vous allez être redirigé vers la page d'inscription de nouveaux joueurs.[/bold]",
+            "too_few_player_created": "[italic red]\n\nVeuillez d'abord inscrire au moins[bold] 8 joueurs[/bold][/italic red]"\
+                "[italic red] afin de pouvoir les assigner à un tournois[/italic red]"\
+                "\n\n[bold]Vous allez être redirigé vers la page d'inscription de nouveaux joueurs.[/bold]",
+            "wrong_player_number_selected": "[italic red]Veuillez selectionner[bold] 8 joueurs[/bold][/italic red]",
+            "no_tournament_created": "[italic red][bold]\n\nVous n'avez pas encore créé de tournoi.[/bold][/italic red]"\
+                "\n\n[bold]Vous allez être redirigé vers la page de création de tournois.[/bold]"
+                
+        }[category]
 
-    def __check_date_format(self, date: str):
+    def _check_date_format(self, date: str):
         try:
             datetime.datetime.strptime(date, "%d-%m-%Y %H:%M")
             return True
         except ValueError:
             return False
-
-    def __display_main_menu_title(
-        self,
-    ):
-        """__display_main_menu_title
-        Returns:
-            nothing
-        """
-        return self.console.print(
-            "[bold][italic yellow]GESTION TOURNOIS D'ECHECS[/italic yellow][/bold]\n",
-            style=None,
-            justify="center",
-        )
-
-    def __display_create_tournament_menu_title(self):
-        """__display_main_menu_title
-        Returns:
-            display tournament create title
-        """
-        return self.console.print(
-            "[bold][italic yellow]CREER UN NOUVEAU TOURNOI[/italic yellow][/bold]\n",
-            style=None,
-            justify="center",
-        )
-
-    def __display_save_tournament_menu_title(self):
-        """__display_main_menu_title
-        Returns:
-            display tournament create title
-        """
-        return self.console.print(
-            "[bold][italic yellow]CONFIRMER LA CREATION DE VOTRE TOURNOI[/italic yellow][/bold]\n",
-            style=None,
-            justify="center",
-        )
 
     def display_main_menu(self):
         """display_main_menu
@@ -170,8 +101,11 @@ class Menu:
             method
         """
         while True:
-            self.__display_main_menu_title()
-            self.menu_choices = 0
+            self.console.print(
+                "[bold][italic yellow]GESTION TOURNOIS D'ECHECS[/italic yellow][/bold]\n",
+                style=None,
+                justify="center",
+            )
             print(
                 Panel.fit(
                     "[bold green]Menu:[/bold green]\n\n"
@@ -186,91 +120,100 @@ class Menu:
             try:
                 self.menu_choices = int(input("Entrez votre choix: "))
                 if not (self.menu_choices >= 1 and self.menu_choices <= 5):
-                    self.__return_msg_error("main_choice_value")
-                    self.__clear_screen(1)
+                    self.console.print(self._return_msg_error("main_choice_value"))
+                    self._clear_screen(1)
                 else:
                     break
             except ValueError:
-                self.__return_msg_error("main_choice_type")
-                self.__clear_screen(1)
+                self.console.print(self._return_msg_error("main_choice_type"))
+                self._clear_screen(1)
         if self.menu_choices == 1:
             self.display_create_tournament_menu()
+        elif self.menu_choices == 2:
+            self.display_create_player_menu()
+        elif self.menu_choices == 3:
+            self.display_tournament_view()
         elif self.menu_choices == 5:
-            print("[italic red]Le programme va maintenant se terminer, à très bientôt.\n[/italic red]")
-            self.__clear_screen(1)
-            return self.__exit(1)
+            self.console.print("[italic red]Le programme va maintenant se terminer, à très bientôt.\n[/italic red]")
+            self._clear_screen(1)
+            return self._exit(1)
 
     def display_create_tournament_menu(self):
         """display_create_tournament_menu
         display tournament creation menu and title
         loop as long as the entries are erroneous
         Returns:
-            int: _self.menu_choices
+            dict : tournament data
         """
-        self.__clear_screen(0)
-        player_data = Engine()
-        self.__display_create_tournament_menu_title()
+        self._clear_screen(0)
         self.console.print(
-            "[bold]\nBienvenue dans le menu de création d'un nouveau tournoi.\nVeuillez remplire correctement les informations suivantes:\n[/bold]"
-            "[italic]Appuyez sur [/italic][bold green]'o'[/bold green][italic] pour continuer ou [/italic][bold green]'n'[/bold green][italic]"
+            "[bold][italic yellow]CREER UN NOUVEAU TOURNOI[/italic yellow][/bold]\n",
+            style=None,
+            justify="center",
+        )
+        self.console.print(
+            "[bold]\nBienvenue dans le menu de création d'un nouveau tournoi.[/bold]"
+            "[bold]\nVeuillez remplire correctement les informations suivantes:\n[/bold]"
+            "[italic]Appuyez sur [/italic]"
+            "[bold green]'o'[/bold green] [italic] pour continuer ou [/italic][bold green]'n'[/bold green][italic]"
             " pour revenir au menu principal[/italic]\n\n"
         )
 
         while True:
             response = input("Continuer (o/n): ")
             if response.lower() != "n" and response.lower() != "o":
-                self.__return_msg_error("wrong_input_choice_to_continue")
+                self.console.print(self._return_msg_error("wrong_input_choice_to_continue"))
             elif response.lower() == "o":
                 break
             elif response.lower() == "n":
-                self.__clear_screen(0)
+                self._clear_screen(0)
                 return self.display_main_menu()
 
         while True:
             try:
                 tournament_name = input("\n\nNom du tournoi: ")
                 if not tournament_name:
-                    self.__return_msg_error("empty_field")
+                    self.console.print(self._return_msg_error("empty_field"))
                 else:
                     break
             except ValueError:
-                self.console.print(self.__return_msg_error("empty_field"))
+                self.console.print(self._return_msg_error("empty_field"))
 
         while True:
             try:
                 location = input("\nLieu du tournoi: ")
                 if not location:
-                    self.__return_msg_error("empty_field")
+                    self.console.print(self._return_msg_error("empty_field"))
                 else:
                     break
             except ValueError:
-                self.__return_msg_error("empty_field")
+                self.console.print(self._return_msg_error("empty_field"))
 
         while True:
             try:
                 tournament_date_begin = input("\nDate et heure de début du tournoi (jj-mm-aaaa hh:mm): ")
-                if self.__check_date_format(tournament_date_begin) is False:
-                    self.__return_msg_error("date_format")
+                if self._check_date_format(tournament_date_begin) is False:
+                    self.console.print(self._return_msg_error("date_format"))
                 else:
                     break
             except ValueError:
-                self.__return_msg_error("date_format")
+                self.console.print(self._return_msg_error("date_format"))
 
         while True:
             try:
                 tournament_date_end = input("\nDate et heure de fin du tournoi (jj-mm-aaaa hh:mm): ")
-                if self.__check_date_format(tournament_date_end) is False:
-                    self.__return_msg_error("date_format")
+                if self._check_date_format(tournament_date_end) is False:
+                    self.console.print(self._return_msg_error("date_format"))
                 else:
                     break
             except ValueError:
-                self.__return_msg_error("date_format")
+                self.console.print(self._return_msg_error("date_format"))
 
         while True:
             number_of_turn = input("\nTours par manche (4 par défaut si laissé vide): ")
             if number_of_turn != "":
                 if not (number_of_turn.isdigit() and int(number_of_turn) > 0):
-                    self.__return_msg_error("wrong_turn_type_entry")
+                    self.console.print(self._return_msg_error("wrong_turn_type_entry"))
                 else:
                     number_of_turn = int(number_of_turn)
                     break
@@ -282,7 +225,7 @@ class Menu:
             number_of_round = input("\nNombre de ronde (3 par défaut si laissé vide): ")
             if number_of_round != "":
                 if not (number_of_round.isdigit() and int(number_of_round) > 0):
-                    self.__return_msg_error("wrong_turn_type_entry")
+                    self.console.print(self._return_msg_error("wrong_turn_type_entry"))
                 else:
                     number_of_round = int(number_of_round)
                     break
@@ -290,13 +233,13 @@ class Menu:
                 number_of_round = 3
                 break
 
-        if len(player_data.get_players_list()) >= 8:
+        if len(self.controller_data.get_players_list()) >= 8:
             table = Table(title="\n\n[bold]Liste des joueurs à inscrire à ce tournoi[/bold]\n")
             table.add_column("id", justify="center", style="cyan", no_wrap=True)
             table.add_column("nom", justify="center", style="magenta", no_wrap=True)
             table.add_column("Prenom", justify="center", style="green", no_wrap=True)
 
-            for player in player_data.get_players_list():
+            for player in self.controller_data.get_players_list():
                 table.add_row(
                     str(player["id"]),
                     str(player["last_name"]),
@@ -315,36 +258,36 @@ class Menu:
                 # store it in list
                 players_list = [int(nb) for nb in research.split(",") if nb != ""]
                 if len(players_list) < 8 or len(players_list) > 8:
-                    self.__return_msg_error("wrong_player_number_selected")
+                    self.console.print(self._return_msg_error("wrong_player_number_selected"))
                 else:
                     break
 
-        elif len(player_data.get_players_list()) <= 8 and len(player_data.get_players_list()) > 0:
-            self.__return_msg_error("too_few_player_created")
+        elif len(self.controller_data.get_players_list()) <= 8 and len(self.controller_data.get_players_list()) > 0:
+            self.console.print(self._return_msg_error("too_few_player_created"))
             # redirection here...
         else:
-            self.__return_msg_error("no_player_created")
+            self.console.print(self._return_msg_error("no_player_created"))
             # redirection here...
 
         while True:
             try:
                 time_controller_choice = input("Tournée (blitz / bullet / coup_rapide): ")
-                if time_controller_choice and self.time_controller.check_enum_status(time_controller_choice) is False:
-                    self.__return_msg_error("time_controller_field")
+                if time_controller_choice and self.controller_data.check_enum_status(time_controller_choice) is False or not time_controller_choice:
+                    self.console.print(self._return_msg_error("time_controller_field"))
                 else:
                     break
             except ValueError:
-                self.console.print(self.__return_msg_error("empty_field"))
+                self.console.print(self._return_msg_error("empty_field"))
 
         while True:
             try:
                 description = input("\nDescription du tournois: ")
                 if not description:
-                    self.__return_msg_error("empty_field")
+                    self.console.print(self._return_msg_error("empty_field"))
                 else:
                     break
             except ValueError:
-                self.console.print(self.__return_msg_error("empty_field"))
+                self.console.print(self._return_msg_error("empty_field"))
 
         console.print("[italic]\n\nVous allez maintenant être redirigé vers la page de sauvegarde[/italic]")
         self.tournament_data = {
@@ -361,12 +304,20 @@ class Menu:
         return self.display_save_tournament()
 
     def display_save_tournament(self):
-        self.__clear_screen(1)
-        self.__display_save_tournament_menu_title()
+        """display_save_tournament
+        save tornament in database
+        """
+        self._clear_screen(1)
+        self.console.print(
+            "[bold][italic yellow]CONFIRMER LA CREATION DE VOTRE TOURNOI[/italic yellow][/bold]\n",
+            style=None,
+            justify="center",
+        )
         self.console.print(
             "[bold]\nDernière étape avant la création de votre nouveau tournois[/bold]"
-            "[bold]Veuillez vérifier que les informations entrées sont correctes.\n[/bold]"
-            "[italic]Appuyez sur [/italic][bold green]'o'[/bold green][italic] pour sauvegarder ou [/italic][bold green]'n'[/bold green][italic]"
+            "[bold] Veuillez vérifier que les informations entrées sont correctes.\n[/bold]"
+            "[italic]Appuyez sur [/italic]"
+            "[bold green]'o'[/bold green][italic] pour sauvegarder ou [/italic][bold green]'n'[/bold green][italic]"
             " pour annuler et revenir au menu principal[/italic]\n\n"
         )
 
@@ -375,31 +326,101 @@ class Menu:
                 "[bold]Vos informations[/bold]\n\n"
                 f"[bold green]Nom du tournoi:[/bold green] [bold]{self.tournament_data['tournament_name']}[/bold]\n"
                 f"[bold green]Lieu du tournoi:[/bold green] [bold]{self.tournament_data['location']}[/bold]\n"
-                f"[bold green]date de début:[/bold green] [bold]{self.tournament_data['tournament_date_begin']}[/bold]\n"
-                f"[bold green]date de fin:[/bold green] [bold]{self.tournament_data['tournament_date_end']}[/bold]\n"
-                f"[bold green]nombre de tour par ronde:[/bold green] [bold]{self.tournament_data['number_of_turn']}[/bold]\n"
-                f"[bold green]nombre de ronde:[/bold green] [bold]{self.tournament_data['number_of_round']}[/bold]\n"
+                f"[bold green]date début:[/bold green] [bold]{self.tournament_data['tournament_date_begin']}[/bold]\n"
+                f"[bold green]date fin:[/bold green] [bold]{self.tournament_data['tournament_date_end']}[/bold]\n"
+                f"[bold green]tour par ronde:[/bold green] [bold]{self.tournament_data['number_of_turn']}[/bold]\n"
+                f"[bold green]ronde:[/bold green] [bold]{self.tournament_data['number_of_round']}[/bold]\n"
                 f"[bold green]Liste des joueurs:[/bold green] [bold]{self.tournament_data['players_list']}[/bold]\n"
-                f"[bold green]control du temps:[/bold green] [bold]{self.tournament_data['time_controller_choice']}[/bold]\n"
-                f"[bold green]description du tournoi:[/bold green] [bold]{self.tournament_data['description']}[/bold]\n",
+                f"[bold green]temps:[/bold green] [bold]{self.tournament_data['time_controller_choice']}[/bold]\n"
+                f"[bold green]description:[/bold green] [bold]{self.tournament_data['description']}[/bold]\n",
                 border_style="red",
             )
         )
-
+    
         while True:
             response = input("sauvegarder (o/n): ")
             if response.lower() != "n" and response.lower() != "o":
-                self.__return_msg_error("wrong_input_choice_to_save")
+                self.console.print(self._return_msg_error("wrong_input_choice_to_save"))
             elif response.lower() == "o":
                 tournament = Tournament(self.tournament_data)
                 tournament.save()
-                self.console.print("\n[bold]Le tournoi a été correctement sauvegardé, vous allez être redirigé vers le menu principal.[/bold]")
-                self.__clear_screen(1)
+                self.console.print(
+                    "\n[bold]Le tournoi a été correctement sauvegardé,[/bold]"
+                    "[bold]vous allez être redirigé vers le menu principal.[/bold]"
+                )
+                self._clear_screen(1)
                 return self.display_main_menu()
             elif response.lower() == "n":
-                self.__clear_screen(0)
+                self._clear_screen(0)
                 return self.display_main_menu()
+    
+    def display_tournament_view(self):
+        self.console.print(
+            "[bold][italic yellow]CONSULTER LES TOURNOIS CRÉÉS[/italic yellow][/bold]\n",
+            style=None,
+            justify="right",
+        )
+        if len(self.controller_data.get_tournament_list()) >= 1:
+            table = Table(title="\n\n[bold]Liste des joueurs à inscrire à ce tournoi[/bold]\n")
+            table.add_column("id", justify="center", style="green", no_wrap=True)
+            table.add_column("nom", justify="center", style="cyan", no_wrap=True)
+            table.add_column("lieu", justify="center", style="cyan", no_wrap=True)
+            table.add_column("date_debut", justify="center", style="cyan", no_wrap=True)
+            table.add_column("date_fin", justify="center", style="cyan", no_wrap=True)
+            table.add_column("nbr_tour", justify="center", style="cyan", no_wrap=True)
+            table.add_column("nbr_manche", justify="center", style="cyan", no_wrap=True)
+            table.add_column("liste_joueurs", justify="center", style="cyan", no_wrap=True)
+            table.add_column("time", justify="center", style="cyan", no_wrap=True)
+            table.add_column("description", justify="center", style="cyan", no_wrap=True)
+            
+
+            for tournament in self.controller_data.get_tournament_list():
+                table.add_row(
+                    str(tournament["id"]),
+                    str(tournament["name"]),
+                    str(tournament["location"]),
+                    str(tournament["tournament_date_begin"]),
+                    str(tournament["tournament_date_end"]),
+                    str(tournament["number_of_turn"]),
+                    str(tournament["number_of_round"]),
+                    str(tournament["players_list"]),
+                    str(tournament["time_controller_choice"]),
+                    str(tournament["description"]),
+                )
+                
+            console = Console()
+            console.print(table)
+            self.console.print(
+            "[italic]\n\nAppuyez sur [/italic]"
+            "[bold green]'o'[/bold green][italic] pour revenir au menu ou [/italic][bold green]'q'[/bold green][italic]"
+            " pour quitter[/italic]\n\n"
+            )
+            while True:
+                response = input("Reponse (o / q): ")
+                if response.lower() != "q" and response.lower() != "o":
+                    self.console.print(self._return_msg_error("wrong_input_choice_to_save"))
+                elif response.lower() == "o":
+                    self.console.print("[bold]vous allez être redirigé vers le menu principal.[/bold]")
+                    self._clear_screen(1)
+                    return self.display_main_menu()
+                elif response.lower() == "q":
+                    self.console.print("[bold]Le programme va maintenant se terminer, à très bientôt.\n[/bold]")
+                    self._clear_screen(1)
+                    return self._exit(0)
+        else:
+            self.console.print(self._return_msg_error("no_tournament_created"))
+            self._clear_screen(1)
+            return self.display_create_tournament_menu()
+            
+
+    def display_create_player_menu(self):
+        """display_create_player_menu
+        display player creation menu and title
+        loop as long as the entries are erroneous
+        Returns:
+            dict: player data
+        """
+        self._clear_screen(0)
 
 
-x = Menu()
-x.display_main_menu()
+Menu()

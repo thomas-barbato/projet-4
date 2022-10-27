@@ -6,7 +6,8 @@ import sys
 
 # used to unallow writing db_chess.json anywhere but in tables.py
 DIR = f"{os.sep}".join(os.getcwd().split(os.sep)[:-1]) + os.sep + "models" + os.sep + "db_chess.json"
-db = TinyDB(DIR)
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+db = TinyDB(os.path.join(ROOT_DIR,"db_chess.json"))
 
 
 class Player:
