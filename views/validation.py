@@ -37,6 +37,9 @@ def display_error(category: str):
         "[italic red] pour confirmer ou"
         "[/italic red][bold green] 'n'[/bold green]"
         "[italic red] pour annuler et revenir au menu principal[/italic red]\n",
+        "wrong_match_result_input": "[italic red]Mauvais choix selectionné[/italic red]"
+        "[italic red] veuillez entrer l'un des choix suivants: [/italic red]"
+        "[bold red]1, 2[/bold red][italic red] ou [/italic red][bold red]3[/bold red]" 
     }[category]
 
 

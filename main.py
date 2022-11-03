@@ -1,5 +1,5 @@
 """import"""
-from views.menu import Menu
+from views.menu import TournamentMenu
 
 if __name__ == "__main__":
-    Menu()
+    TournamentMenu()

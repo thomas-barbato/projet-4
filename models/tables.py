@@ -1,16 +1,8 @@
 """import"""
-from tinydb import TinyDB, Query, where
-from datetime import datetime
+from tinydb import TinyDB
 from enum import Enum
-import os
 
-# used to unallow writing db_chess.json anywhere but in tables.py
-if os.path.basename(__file__) != "main.py":
-    DIR = f"{os.sep}".join(os.getcwd().split(os.sep)[:-1]) + os.sep + "db_chess.json"
-else:
-    DIR = f"{os.sep}".join(os.getcwd().split(os.sep)) + os.sep + "db_chess.json"
-
-db = TinyDB(os.path.join(DIR))
+db = TinyDB("db_chess.json")
 
 
 class Table:
@@ -41,6 +33,7 @@ class Player(Table):
             self.age: int = data["age"]
             self.ranking: int = data["ranking"]
             self.table: str = db.table(self.table)
+            self.score: float = 0.0
             self.serialized_data: dict = {
                 "id": len(self.table),
                 "last_name": self.last_name,
@@ -49,8 +42,12 @@ class Player(Table):
                 "gender": self.gender,
                 "age": self.age,
                 "ranking": self.ranking,
-            }
+                "score": self.score,
+        }
 
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} est classé {self.ranking}\
+            avec score de {self.score}"
 
 class TimeController(Enum):
     BULLET = "bullet"
@@ -68,15 +65,13 @@ class Tournament(Table):
             self.tournament_date_end: str = data["tournament_date_end"]
             self.number_of_turn: int = data["number_of_turn"]
             self.number_of_round: int = data["number_of_round"]
-            self.players_list: dict = data["players_list"]
+            self.players_choice: dict = data["players_choice"]
             self.time_controller_choice: str = (
                 data["time_controller_choice"]
                 if data["time_controller_choice"] in TimeController._value2member_map_
                 else "Empty"
             )
             self.description: str = data["description"]
-            self.pairing: dict = {}
-
             self.table: str = db.table(self.table)
             self.serialized_data: dict = {
                 "id": len(self.table),
@@ -86,12 +81,28 @@ class Tournament(Table):
                 "tournament_date_end": self.tournament_date_end,
                 "number_of_turn": self.number_of_turn,
                 "number_of_round": self.number_of_round,
-                "players_list": self.players_list,
+                "players_choice": self.players_choice,
                 "time_controller_choice": self.time_controller_choice,
                 "description": self.description,
-                "pairing": self.pairing,
-            }
+                }
+    def __str__(self):
+        return f"{self.tournament_name}"
 
+class Tour(Table):
+    matches = []
+    def __init__(self, data):
+        self.table = "tour"
+        self.turn_name: str = data['turn_name']
+        self.ronde_instance: list = data['ronde_instance']
+        self.time_begin: str = data['time_begin']
+        self.time_end: str = data['time_end']
+        self.table: str = db.table(self.table)
+        self.serialized_data: dict = {
+            "turn_name" : self.turn_name,
+            "ronde_instance": self.ronde_instance,
+            "time_begin": self.time_begin,
+            "time_end": self.time_end
+        }
 
 if len(db.table("players")) < 8:
     x = Player(
@@ -113,6 +124,7 @@ if len(db.table("players")) < 8:
             "gender": "female",
             "age": 34,
             "ranking": 1,
+            "score": 0
         }
     )
     x.save()
@@ -124,6 +136,7 @@ if len(db.table("players")) < 8:
             "gender": "male",
             "age": 37,
             "ranking": 4,
+            "score": 0
         }
     )
     x.save()
@@ -135,6 +148,7 @@ if len(db.table("players")) < 8:
             "gender": "male",
             "age": 37,
             "ranking": 5,
+            "score": 0
         }
     )
     x.save()
@@ -146,6 +160,7 @@ if len(db.table("players")) < 8:
             "gender": "male",
             "age": 22,
             "ranking": 2,
+            "score": 0
         }
     )
     x.save()
@@ -157,6 +172,7 @@ if len(db.table("players")) < 8:
             "gender": "male",
             "age": 33,
             "ranking": 1,
+            "score": 0
         }
     )
     x.save()
@@ -168,6 +184,7 @@ if len(db.table("players")) < 8:
             "gender": "male",
             "age": 63,
             "ranking": 4,
+            "score": 0
         }
     )
     x.save()
@@ -179,9 +196,7 @@ if len(db.table("players")) < 8:
             "gender": "female",
             "age": 32,
             "ranking": 4,
+            "score": 0
         }
     )
     x.save()
-
-# in_db = Query()
-# print(db.table("players").search(in_db.id != 2))
