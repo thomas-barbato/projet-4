@@ -26,7 +26,8 @@ def display_error(category: str):
         "too_few_player_created": "[italic red]\n\nVeuillez inscrire au moins[bold] 8 joueurs[/bold][/italic red]"
         "[italic red] afin de pouvoir les assigner à un tournois[/italic red]"
         "\n\n[bold]Vous allez être redirigé vers la page d'inscription de nouveaux joueurs.[/bold]",
-        "wrong_player_number_selected": "[italic red]Veuillez selectionner[bold] 8 joueurs[/bold][/italic red]",
+        "wrong_player_number_selected": "[italic red]Veuillez selectionner[bold] 8 joueurs [/bold]" 
+        "[bold]uniques et existants[/bold][/italic red]",
         "no_tournament_created": "[italic red][bold]\n\nVous n'avez pas encore créé de tournoi.[/bold][/italic red]"
         "\n\n[bold]Vous allez être redirigé vers la page de création de tournois.[/bold]",
         "wrong_input_choice_to_save": "[italic red]Appuyez sur [/italic red][bold]'o'[/bold]"
@@ -39,7 +40,7 @@ def display_error(category: str):
         "[italic red] pour annuler et revenir au menu principal[/italic red]\n",
         "wrong_match_result_input": "[italic red]Mauvais choix selectionné[/italic red]"
         "[italic red] veuillez entrer l'un des choix suivants: [/italic red]"
-        "[bold red]1, 2[/bold red][italic red] ou [/italic red][bold red]3[/bold red]" 
+        "[bold red]1, 2[/bold red][italic red] ou [/italic red][bold red]3[/bold red]",
     }[category]
 
 

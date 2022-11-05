@@ -15,7 +15,7 @@ class CreateTournament:
         self.console = Console()
         self.player_controller = PlayerController()
         self.tournament_controller = TournamentController()
-        
+
         self.tournament_name: str = ""
         self.location: str = ""
         self.tournament_date_begin: str = ""
@@ -27,6 +27,9 @@ class CreateTournament:
         self.time_controller_choice: str = ""
         self.description: str = ""
         self.pairing_round: tuple = ()
+    
+    def __call__(self):
+        self.display_create_menu()
 
     def getter(self, index):
         return {
@@ -34,7 +37,6 @@ class CreateTournament:
             "location": self.location,
             "tournament_date_begin": self.tournament_date_begin,
             "tournament_date_end": self.tournament_date_end,
-            "number_of_turn": self.number_of_turn,
             "number_of_round": self.number_of_round,
             "players_choice": self.players_choice,
             "time_controller_choice": self.time_controller_choice,
@@ -47,7 +49,6 @@ class CreateTournament:
             "location": self.location,
             "tournament_date_begin": self.tournament_date_begin,
             "tournament_date_end": self.tournament_date_end,
-            "number_of_turn": self.number_of_turn,
             "number_of_round": self.number_of_round,
             "players_choice": self.players_choice,
             "time_controller_choice": self.time_controller_choice,
@@ -72,13 +73,12 @@ class CreateTournament:
         self.display_location_tournament()
         self.display_tournament_date("begin")
         self.display_tournament_date("end")
-        self.display_number_of_turn()
         self.display_number_of_round()
         self.display_player_list()
         self.display_player_choice()
         self.display_time_controller_choice()
         self.display_description()
-        
+
     def display_tournament_continue(self):
         self.console.print(
             "[bold]\nBienvenue dans le menu de création d'un nouveau tournoi.[/bold]"
@@ -140,18 +140,6 @@ class CreateTournament:
             self.console.print(display_error("date_format"))
             return self.display_tournament_date(temp)
 
-    def display_number_of_turn(self):
-        self.number_of_turn = input("\nTours par manche (4 par défaut si laissé vide): ")
-        if self.number_of_turn != "":
-            if not (self.number_of_turn.isdigit() and int(self.number_of_turn) > 0):
-                self.console.print(display_error("wrong_turn_type_entry"))
-                return self.display_number_of_turn()
-            else:
-                return int(self.number_of_turn)
-        else:
-            # default value
-            self.number_of_turn = 4
-
     def display_number_of_round(self):
         self.number_of_round = input("\nNombre de ronde (3 par défaut si laissé vide): ")
         if self.number_of_round != "":
@@ -171,21 +159,17 @@ class CreateTournament:
             table.add_column("Id", justify="center", style="cyan", no_wrap=True)
             table.add_column("Nom", justify="center", style="white", no_wrap=True)
             table.add_column("Prenom", justify="center", style="white", no_wrap=True)
-            table.add_column("Rank", justify="center", style="green", no_wrap=True)
-            table.add_column("Score", justify="center", style="green", no_wrap=True)
 
             for player in self.player_controller.get_players_list():
                 table.add_row(
-                    str(player["id"]),
-                    str(player["last_name"]),
+                    str(player.doc_id),
                     str(player["first_name"]),
-                    str(player["ranking"]),
-                    str(player["score"]),
+                    str(player["last_name"]),
                 )
             self.console.print(table)
 
         elif (
-            len(self.player_controller.get_players_list()) <= 8 and len(self.player_controller.get_players_list()) > 0
+            len(self.player_controller.get_players_list()) > 0 and len(self.player_controller.get_players_list()) <= 8
         ):
             self.console.print(display_error("too_few_player_created"))
             # redirection here...
@@ -198,12 +182,13 @@ class CreateTournament:
             "\n\n[bold]Veuillez selectionner [blue]8[/blue] joueurs parmis la liste présente[/bold]",
             "[bold]en entrant leurs numéro [blue]ID[/blue] séparés par un espace[/bold]",
         )
-        self.players_choice = input("Entrez votre selection: ")
+        set_players_choice = input("Entrez votre selection: ")
         # delete every character is not a number
-        research = re.sub(r"[^0-9]", ",", self.players_choice)
+        research = re.sub(r"[^0-9]", ",", set_players_choice)
         # store it in list
         self.players_choice = [int(nb) for nb in research.split(",") if nb != ""]
-        if len(self.players_choice) < 8 or len(self.players_choice) > 8:
+        # use len(set()) to delete doublon and check if len is okay.
+        if len(set(self.players_choice)) < 8 or len(set(self.players_choice)) > 8:
             self.console.print(display_error("wrong_player_number_selected"))
             return self.display_player_choice()
         else:
@@ -211,13 +196,12 @@ class CreateTournament:
 
     def display_time_controller_choice(self):
         try:
-            timeController = TournamentController()
             self.time_controller_choice = input("Tournée (blitz / bullet / coup_rapide): ")
-            if (
-                self.time_controller_choice != ''
-                and timeController.check_enum_status(self.time_controller_choice) is False
-                or not self.time_controller_choice
-            ):
+            if self.time_controller_choice == "" or not self.time_controller_choice.lower() in [
+                "blitz",
+                "bullet",
+                "coup_rapide",
+            ]:
                 self.console.print(display_error("time_controller_field"))
                 return self.display_time_controller_choice()
             else:
@@ -228,12 +212,8 @@ class CreateTournament:
 
     def display_description(self):
         try:
-            self.description = input("\nDescription du tournois: ")
-            if not self.description:
-                self.console.print(display_error("empty_field"))
-                return self.display_description()
-            else:
-                return self.description
+            self.description = input("\nDescription du tournois (facultatif): ")
+            return self.description
         except ValueError:
             self.console.print(display_error("empty_field"))
             return self.display_description()
@@ -266,7 +246,6 @@ class CreateTournament:
                 f"[bold green]date début:[/bold green]"
                 f"[bold]{self.tournament_data()['tournament_date_begin']}[/bold]\n"
                 f"[bold green]date fin:[/bold green] [bold]{self.tournament_data()['tournament_date_end']}[/bold]\n"
-                f"[bold green]tour par ronde:[/bold green] [bold]{self.tournament_data()['number_of_turn']}[/bold]\n"
                 f"[bold green]ronde:[/bold green] [bold]{self.tournament_data()['number_of_round']}[/bold]\n"
                 f"[bold green]temps:[/bold green] [bold]{self.tournament_data()['time_controller_choice']}[/bold]\n"
                 f"[bold green]description:[/bold green] [bold]{self.tournament_data()['description']}[/bold]\n",
@@ -278,14 +257,12 @@ class CreateTournament:
             selected_players_table.add_column("id", justify="center", style="cyan", no_wrap=True)
             selected_players_table.add_column("Nom de famille", justify="center", style="white", no_wrap=True)
             selected_players_table.add_column("Prenom", justify="center", style="white", no_wrap=True)
-            selected_players_table.add_column("rank", justify="center", style="green", no_wrap=True)
             for i in range(0, len(player_controller.get_players_list())):
-                if player_controller.get_players_list()[i]["id"] in self.players_choice:
+                if player_controller.get_players_list()[i]["doc_id"] in self.players_choice:
                     selected_players_table.add_row(
-                        str(player_controller.get_players_list()[i]["id"]),
+                        str(player_controller.get_players_list()[i]["doc_id"]),
                         str(player_controller.get_players_list()[i]["first_name"]),
                         str(player_controller.get_players_list()[i]["last_name"]),
-                        str(player_controller.get_players_list()[i]["ranking"]),
                     )
 
             self.console.print(selected_players_table)
@@ -298,8 +275,9 @@ class CreateTournament:
         else:
             if response.lower() == "o":
 
-                
-                self.pairing_round = TournamentController(self.tournament_data()).set_pairing_first_round(self.players_choice)
+                self.pairing_round = TournamentController(self.tournament_data()).set_pairing_first_round(
+                    self.players_choice
+                )
                 tournament_controller_data = TournamentController(self.tournament_data())
                 tournament_controller_data.save()
                 self.console.print("[bold]Sauvegarde terminée...[/bold]")
@@ -325,6 +303,7 @@ class CreateTournament:
             pairing_table.add_column("Competiteur 1", justify="center", style="white", no_wrap=True)
             pairing_table.add_column("Competiteur 2", justify="center", style="white", no_wrap=True)
             for i in range(0, len(self.pairing_round)):
+                print(self.pairing_round)
                 pairing_table.add_row(
                     f"{i}",
                     f'{self.pairing_round[i][0]["last_name"]}',
@@ -332,20 +311,22 @@ class CreateTournament:
                 )
             self.console.print(pairing_table)
             self.display_tournament_begin()
-    
+
     def display_tournament_begin(self):
-        self.console.print(f"\n[bold]Le tournoi va se dérouler en {self.number_of_turn} tours.[/bold]\n"
-                           "[bold]Chaque équipes vont s'affronter:[/bold]\n"
-                           "un match gagné = 1 point\n"
-                           "un match perdu = 0 point\n"
-                           "un match nul = 0.5 pour les deux participants.")
-        for i in range(1,self.number_of_round+1):
+        self.console.print(
+            f"\n[bold]Le tournoi va se dérouler en {self.number_of_round} tours.[/bold]\n"
+            "[bold]Chaque équipes vont s'affronter:[/bold]\n"
+            "un match gagné = 1 point\n"
+            "un match perdu = 0 point\n"
+            "un match nul = 0.5 pour les deux participants."
+        )
+        for tour in range(1, self.number_of_round + 1):
             choice = 0
-            if i == 1:
-                self.console.print(f"\n\n[bold]Match {i}:[/bold]\n")
-                
-            else: 
-                pairing_table = Table(title="\n\n[bold]Match {i}:[/bold]\n")
+            if tour == 1:
+                self.console.print(f"\n\n[bold]Match {tour}:[/bold]\n")
+
+            else:
+                pairing_table = Table(title="\n\n[bold]Match {tour}:[/bold]\n")
                 pairing_table.add_column("Numéro Equipe", justify="center", style="white", no_wrap=True)
                 pairing_table.add_column("Competiteur 1", justify="center", style="white", no_wrap=True)
                 pairing_table.add_column("Competiteur 2", justify="center", style="white", no_wrap=True)
@@ -356,34 +337,48 @@ class CreateTournament:
                         f'{self.pairing_round[i][1]["last_name"]}',
                     )
                 self.console.print(pairing_table)
-            for paire in self.pairing_round:
-                self.console.print("[bold]Selectionnez la valeur correcte:\n[/bold]"
-                                   f"[italic green]1)[/italic green] {paire[0]['last_name']}\n"
-                                   f"[italic green]2)[/italic green] {paire[1]['last_name']}\n"
-                                   "[italic green]3)[/italic green] Match nul\n")
-                
+            # from tuple to list to allow editing
+            self.pairing_round = list(self.pairing_round)
+            for i in range(0,len(self.pairing_round)):
+                self.console.print(
+                    "[bold]Selectionnez la valeur correcte:\n[/bold]"
+                    f"[italic green]1)[/italic green] {self.pairing_round[i][0]['last_name']}\n"
+                    f"[italic green]2)[/italic green] {self.pairing_round[i][1]['last_name']}\n"
+                    "[italic green]3)[/italic green] Match nul\n"
+                )
                 while True:
                     choice = input("Résultat: ")
-                    if not choice or choice not in ["1","2","3"]:
+                    if not choice or choice not in ["1", "2", "3"]:
                         self.console.print(display_error("wrong_match_result_input"))
                     else:
                         if choice == "1":
-                            self.console.print(f"[bold]Le competiteur [/bold]" 
-                                               f"[bold]{paire[0]['last_name']} prend 1 point[/bold]")
-                            paire[0]['score'] = ( paire[0]['score'] + 1.0 )
+                            self.console.print(
+                                f"[bold]Le competiteur [/bold]" f"[bold]{self.pairing_round[i][0]['last_name']} prend 1 point[/bold]"
+                            )
+                            self.pairing_round[i][0]["score"] += 1.0
                         elif choice == "2":
-                            self.console.print(f"[bold]Le competiteur [/bold]" 
-                                               f"[bold]{paire[1]['last_name']} prend 1 point[/bold]")
-                            paire[1]['score'] = ( paire[1]['score'] + 1.0 )
+                            self.console.print(
+                                f"[bold]Le competiteur [/bold]" f"[bold]{self.pairing_round[i][1]['last_name']} prend 1 point[/bold]"
+                            )
+                            self.pairing_round[i][1]["score"] += 1.0
                         elif choice == "3":
-                            self.console.print(f"[bold]Les competiteurs {paire[0]['last_name']}[/bold]"
-                                                "[bold] et [/bold]"
-                                                f"[bold]{paire[1]['last_name']} prennent 0.5 point[/bold]")
-                            paire[0]['score'] = ( paire[0]['score'] + 0.5 ) 
-                            paire[1]['score'] = ( paire[1]['score'] + 0.5 ) 
+                            self.console.print(
+                                f"[bold]Les competiteurs {self.pairing_round[i][0]['last_name']}[/bold]"
+                                "[bold] et [/bold]"
+                                f"[bold]{self.pairing_round[i][1]['last_name']} prennent 0.5 point[/bold]"
+                            )
+                            self.pairing_round[i][0]["score"] += 0.5
+                            self.pairing_round[i][1]["score"] += 0.5
                         break
-                print(self.pairing_round)
+                # le score doit être mis sur un match
+                # Un match, c'est un truple de liste de 2 joueurs et 2 scores
+                # en fin de match stocker tous les rounds dans TOUR
+                # ex: Tour(match1, match2, match3...)
+                # from tuple to list to allow editing
+                
+                self.pairing_round = tuple(self.pairing_round)
                 self.player_controller.update_score(self.pairing_round)
-                self.pairing_round = TournamentController(self.tournament_data()).set_pairing_next_round(self.players_choice)
+                self.pairing_round = TournamentController(self.tournament_data()).set_pairing_next_round(
+                    self.players_choice
+                )
             self.console.print(f"\n\n[bold]Match {i} Terminé[/bold]\n")
-            

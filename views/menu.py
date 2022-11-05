@@ -1,5 +1,5 @@
 """import"""
-#sys.path.insert(1, os.path.join(sys.path[0], ".."))
+# sys.path.insert(1, os.path.join(sys.path[0], ".."))
 from .create_tournament_view import CreateTournament
 from .screen_and_sys_func import clear_screen, exit_to_console
 from .validation import display_error

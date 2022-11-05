@@ -25,7 +25,6 @@
                 str(tournament["location"]),
                 str(tournament["tournament_date_begin"]),
                 str(tournament["tournament_date_end"]),
-                str(tournament["number_of_turn"]),
                 str(tournament["number_of_round"]),
                 str(tournament["time_controller_choice"]),
                 str(tournament["players_list"]),

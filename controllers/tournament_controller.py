@@ -2,39 +2,32 @@
 import os
 import sys
 from tinydb import TinyDB, Query
-
-sys.path.insert(1, os.path.join(sys.path[0], ".."))
-from models.tables import TimeController, Tournament
+from models.tables import Tournament, Player
 from controllers.player_controller import PlayerController
 
 
 class TournamentController:
     def __init__(self, tournament_data={}):
-        self.time_controller = TimeController
+        self.db = TinyDB("db_chess.json")
         self.tournament_data = tournament_data
-        self.tournament_controller = Tournament(self.tournament_data)
+        self.tournament_model = Tournament(self.tournament_data)
+        self.player_in_tournament = []
+        self.player_model_instance = Player()
         self.playerController = PlayerController()
-        self.db = TinyDB("db_chess_tournament.json")
         self.pairing: tuple() = ()
         self.matchs = []
 
     def save(self):
-        self.tournament_controller.save()
-
-    def update_pairing(self, tournament_data, tournament_name, players_choice):
-        tournament_id = self.db.table("tournaments").search(
-            (Query().name == tournament_name) & (Query().players_choice == players_choice)
-        )[0]["id"]
-        return self.db.table("tournaments").update({"pairing": tournament_data}, Query().id == tournament_id)
-
-    def check_enum_status(self, input: str):
-        if input in self.time_controller._value2member_map_:
-            return True
+        self.tournament_model.save()
 
     def get_tournament_list(self):
-        return self.tournament_controller.display_data()
+        return self.tournament_model.display_data()
+    
+    def set_player_instance(self):
+        pass
 
-    def _set_first_teams(self, player_id_list: list, parameter):
+    def _set_teams(self, player_id_list: list, parameter):
+        players_list = sorted(self.player_model.display_data(), key=lambda d: d[parameter], reverse=True)
         player_list = self.playerController.get_players_by_parameters(player_id_list, parameter)
         first_team: dict = []
         second_team: dict = []
@@ -42,7 +35,6 @@ class TournamentController:
             if i % 2 == 0:
                 first_team.append(
                     {
-                        "id": player_list[i]["id"],
                         "last_name": player_list[i]["last_name"],
                         "ranking": player_list[i]["ranking"],
                         "score": player_list[i]["score"],
@@ -51,26 +43,23 @@ class TournamentController:
             else:
                 second_team.append(
                     {
-                        "id": player_list[i]["id"],
                         "last_name": player_list[i]["last_name"],
                         "ranking": player_list[i]["ranking"],
                         "score": player_list[i]["score"],
                     }
                 )
         return first_team, second_team
-
+    
     def set_pairing_first_round(self, player_id_list: list):
-        first_team, second_team = self._set_first_teams(player_id_list, "ranking")
+        first_team, second_team = self._set_teams(player_id_list, "ranking")
         self.pairing = tuple(zip(first_team, second_team))
         return self.pairing
 
+
+    # change here , from player table to data sended list.
+    # to be able to change score from tournament to another tournament
     def set_pairing_next_round(self, player_id_list: list):
-        first_team, second_team = self._set_first_teams(player_id_list, "score")
+        first_team, second_team = self._set_teams(player_id_list, "score")
         self.pairing = tuple(zip(first_team, second_team))
         print(self.pairing)
         return self.pairing
-
-    def get_pairing(self):
-        return self.pairing
-    
-    
