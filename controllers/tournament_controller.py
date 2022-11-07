@@ -17,12 +17,15 @@ class TournamentController:
         self.pairing: tuple() = ()
         self.matchs = []
 
-    def save(self):
-        self.tournament_model.save()
+    def save(self, tournament_data):
+        self.tournament_model.save(tournament_data)
 
     def get_tournament_list(self):
         return self.tournament_model.display_data()
     
+    def get_player_list(self):
+        return self.player_model_instance.display_data() 
+
     def set_player_instance(self):
         pass
 
@@ -49,17 +52,15 @@ class TournamentController:
                     }
                 )
         return first_team, second_team
-    
+
     def set_pairing_first_round(self, player_id_list: list):
         first_team, second_team = self._set_teams(player_id_list, "ranking")
         self.pairing = tuple(zip(first_team, second_team))
         return self.pairing
-
 
     # change here , from player table to data sended list.
     # to be able to change score from tournament to another tournament
     def set_pairing_next_round(self, player_id_list: list):
         first_team, second_team = self._set_teams(player_id_list, "score")
         self.pairing = tuple(zip(first_team, second_team))
-        print(self.pairing)
         return self.pairing

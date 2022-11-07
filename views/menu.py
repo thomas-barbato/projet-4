@@ -1,6 +1,7 @@
 """import"""
 # sys.path.insert(1, os.path.join(sys.path[0], ".."))
 from .create_tournament_view import CreateTournament
+from .create_player_view import CreatePlayer
 from .screen_and_sys_func import clear_screen, exit_to_console
 from .validation import display_error
 from rich import print, pretty
@@ -58,7 +59,13 @@ class TournamentMenu:
                     if createTournament.display_confirm_tournament_save() == "n":
                         return self.display_menu_choices()
                 elif menu_choices == 2:
-                    pass
+                    createPlayer = CreatePlayer()
+                    if createPlayer.display_player_continue() is False:
+                        return self.display_menu_choices()
+                    if createPlayer.display_confirm_player_save() == "n":
+                        return self.display_menu_choices()
+                    if createPlayer.display_confirm_create_another_player() == "n":
+                        return self.display_menu_choices()
                 elif menu_choices == 3:
                     pass
                 elif menu_choices == 4:
@@ -74,12 +81,3 @@ class TournamentMenu:
             self.console.print(display_error("main_choice_type"))
             clear_screen(1)
             self.display_menu_choices()
-
-    def display_create_player_menu(self):
-        """display_create_player_menu
-        display player creation menu and title
-        loop as long as the entries are erroneous
-        Returns:
-            dict: player data
-        """
-        clear_screen(0)

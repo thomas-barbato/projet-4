@@ -5,26 +5,24 @@ from tinydb import TinyDB, Query, where
 
 class PlayerController:
     def __init__(self):
-        self.time_controller = TimeController
-        self.player_controller = Player()
+        self.player_model = Player()
         self.db = TinyDB("db_chess.json")
 
     def get_players_list(self):
-        return self.player_controller.display_data()
+        return Player().display_data()
 
     def update_score(self, id_list: list):
         # print(id_list)
         for player in id_list:
             self.db.table("players").update_multiple(
                 [
-                    ({"score": player [0]["score"]}, where("last_name") == player[0]["last_name"]),
-                    ({"score": player [1]["score"]}, where("last_name") == player[1]["last_name"]),
+                    ({"score": player[0]["score"]}, where("last_name") == player[0]["last_name"]),
+                    ({"score": player[1]["score"]}, where("last_name") == player[1]["last_name"]),
                 ]
             )
 
-    def save_player(self, data: dict):
-        new_player = Player(data)
-        return new_player.save()
+    def save(self, player_data):
+        self.player_model.save(player_data)
 
     def get_players_by_parameters(self, id_list: list, parameter: str):
         # sort list by ranking or score
@@ -40,3 +38,6 @@ class PlayerController:
             for i in range(0, len(players_data))
             if players_data[i].doc_id in id_list
         }
+
+
+print(Player().display_data())

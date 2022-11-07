@@ -14,8 +14,6 @@ class CreateTournament:
     def __init__(self):
         self.console = Console()
         self.player_controller = PlayerController()
-        self.tournament_controller = TournamentController()
-
         self.tournament_name: str = ""
         self.location: str = ""
         self.tournament_date_begin: str = ""
@@ -26,8 +24,9 @@ class CreateTournament:
         self.players_choice: list = []
         self.time_controller_choice: str = ""
         self.description: str = ""
+        self.id = 1
         self.pairing_round: tuple = ()
-    
+
     def __call__(self):
         self.display_create_menu()
 
@@ -53,7 +52,7 @@ class CreateTournament:
             "players_choice": self.players_choice,
             "time_controller_choice": self.time_controller_choice,
             "description": self.description,
-            "base_pairing": self.pairing_round,
+            "id": 0
         }
 
     def display_create_menu(self):
@@ -154,6 +153,8 @@ class CreateTournament:
 
     def display_player_list(self):
         # add here display limitation
+        n = TournamentController()
+        print(n.get_player_list())
         if len(self.player_controller.get_players_list()) >= 8:
             table = Table(title="\n\n[bold]Liste des joueurs à inscrire à ce tournoi[/bold]\n")
             table.add_column("Id", justify="center", style="cyan", no_wrap=True)
@@ -274,11 +275,21 @@ class CreateTournament:
             return self.display_confirm_tournament_save()
         else:
             if response.lower() == "o":
-
-                self.pairing_round = TournamentController(self.tournament_data()).set_pairing_first_round(
-                    self.players_choice
-                )
-                tournament_controller_data = TournamentController(self.tournament_data())
+                tournament_data = [
+                    self.tournament_name,
+                    self.location,
+                    self.tournament_date_begin,
+                    self.tournament_date_end,
+                    self.number_of_round,
+                    self.players_choice,
+                    self.time_controller_choice,
+                    self.description,
+                    self.id
+                ]
+                #self.pairing_round = TournamentController(self.tournament_data()).set_pairing_first_round(
+                #    self.players_choice
+                #)
+                tournament_controller_data = TournamentController.save(tournament_data)
                 tournament_controller_data.save()
                 self.console.print("[bold]Sauvegarde terminée...[/bold]")
                 clear_screen(1)
@@ -339,7 +350,7 @@ class CreateTournament:
                 self.console.print(pairing_table)
             # from tuple to list to allow editing
             self.pairing_round = list(self.pairing_round)
-            for i in range(0,len(self.pairing_round)):
+            for i in range(0, len(self.pairing_round)):
                 self.console.print(
                     "[bold]Selectionnez la valeur correcte:\n[/bold]"
                     f"[italic green]1)[/italic green] {self.pairing_round[i][0]['last_name']}\n"
@@ -353,12 +364,14 @@ class CreateTournament:
                     else:
                         if choice == "1":
                             self.console.print(
-                                f"[bold]Le competiteur [/bold]" f"[bold]{self.pairing_round[i][0]['last_name']} prend 1 point[/bold]"
+                                f"[bold]Le competiteur [/bold]"
+                                f"[bold]{self.pairing_round[i][0]['last_name']} prend 1 point[/bold]"
                             )
                             self.pairing_round[i][0]["score"] += 1.0
                         elif choice == "2":
                             self.console.print(
-                                f"[bold]Le competiteur [/bold]" f"[bold]{self.pairing_round[i][1]['last_name']} prend 1 point[/bold]"
+                                f"[bold]Le competiteur [/bold]"
+                                f"[bold]{self.pairing_round[i][1]['last_name']} prend 1 point[/bold]"
                             )
                             self.pairing_round[i][1]["score"] += 1.0
                         elif choice == "3":
@@ -375,7 +388,7 @@ class CreateTournament:
                 # en fin de match stocker tous les rounds dans TOUR
                 # ex: Tour(match1, match2, match3...)
                 # from tuple to list to allow editing
-                
+
                 self.pairing_round = tuple(self.pairing_round)
                 self.player_controller.update_score(self.pairing_round)
                 self.pairing_round = TournamentController(self.tournament_data()).set_pairing_next_round(

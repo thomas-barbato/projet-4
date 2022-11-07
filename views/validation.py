@@ -17,16 +17,18 @@ def display_error(category: str):
         "empty_field": "[italic red]Veuillez renseigner ce champ[/italic red]",
         "date_format": "[italic red]Format de date incorrect, format attendu: jj-mm-aaaa hh:mm\nExemple: "
         "[bold]10-09-2022 10:30[/bold][/italic red]\n",
+        "birth_date_format": "[italic red]Format de date incorrect, format attendu: jj-mm-aaaa\nExemple: "
+        "[bold]06-04-1980[/bold][/italic red]\n",
         "wrong_turn_type_entry": "[italic red]Veuillez entrer une valeur correcte, format attendu: "
         "[bold]un entier positif superieur à 0[/bold][/italic red]\n",
         "time_controller_field": "[italic red]Veuillez entrer une valeur correcte, choix attendu:"
         "[bold] blitz[/bold] ou [bold]bullet[/bold] ou [bold]coup_rapide[/bold][/italic red]\n",
-        "no_player_created": "[italic red]\n\nVous n'avez pas encore inscrit de joueur.[/bold][/italic red]"
+        "no_player_created": "[italic red]\n\n[bold]Vous n'avez pas encore inscrit de joueur.[/bold][/italic red]"
         "\n\n[bold]Vous allez être redirigé vers la page d'inscription de nouveaux joueurs.[/bold]",
         "too_few_player_created": "[italic red]\n\nVeuillez inscrire au moins[bold] 8 joueurs[/bold][/italic red]"
         "[italic red] afin de pouvoir les assigner à un tournois[/italic red]"
         "\n\n[bold]Vous allez être redirigé vers la page d'inscription de nouveaux joueurs.[/bold]",
-        "wrong_player_number_selected": "[italic red]Veuillez selectionner[bold] 8 joueurs [/bold]" 
+        "wrong_player_number_selected": "[italic red]Veuillez selectionner[bold] 8 joueurs [/bold]"
         "[bold]uniques et existants[/bold][/italic red]",
         "no_tournament_created": "[italic red][bold]\n\nVous n'avez pas encore créé de tournoi.[/bold][/italic red]"
         "\n\n[bold]Vous allez être redirigé vers la page de création de tournois.[/bold]",
@@ -41,12 +43,22 @@ def display_error(category: str):
         "wrong_match_result_input": "[italic red]Mauvais choix selectionné[/italic red]"
         "[italic red] veuillez entrer l'un des choix suivants: [/italic red]"
         "[bold red]1, 2[/bold red][italic red] ou [/italic red][bold red]3[/bold red]",
+        "gender": "[italic red]Mauvais choix selectionné[/italic red]"
+        "[italic red] veuillez entrer l'un des choix suivants: [/italic red]"
+        "[bold red]homme[/bold red][italic red] ou [/italic red][bold red]femme[/bold red]",
     }[category]
 
 
 def check_date_format(date: str):
     try:
         datetime.datetime.strptime(date, "%d-%m-%Y %H:%M")
+        return True
+    except ValueError:
+        return False
+    
+def check_birth_date_format(date: str):
+    try:
+        datetime.datetime.strptime(date, "%d-%m-%Y")
         return True
     except ValueError:
         return False
