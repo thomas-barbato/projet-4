@@ -1,8 +1,11 @@
 """import"""
 from .validation import display_error, check_date_format
 from .screen_and_sys_func import clear_screen
+from views.menu import TournamentMenu
+from views.play_match_view import Playmatch
 from controllers.tournament_controller import TournamentController
 from controllers.player_controller import PlayerController
+from models.tables import Tournament
 from rich import print
 from rich.console import Console
 from rich.panel import Panel
@@ -13,7 +16,6 @@ import re
 class CreateTournament:
     def __init__(self):
         self.console = Console()
-        self.player_controller = PlayerController()
         self.tournament_name: str = ""
         self.location: str = ""
         self.tournament_date_begin: str = ""
@@ -27,21 +29,6 @@ class CreateTournament:
         self.id = 1
         self.pairing_round: tuple = ()
 
-    def __call__(self):
-        self.display_create_menu()
-
-    def getter(self, index):
-        return {
-            "tournament_name": self.tournament_name,
-            "location": self.location,
-            "tournament_date_begin": self.tournament_date_begin,
-            "tournament_date_end": self.tournament_date_end,
-            "number_of_round": self.number_of_round,
-            "players_choice": self.players_choice,
-            "time_controller_choice": self.time_controller_choice,
-            "description": self.description,
-        }[index]
-
     def tournament_data(self):
         return {
             "tournament_name": self.tournament_name,
@@ -52,7 +39,7 @@ class CreateTournament:
             "players_choice": self.players_choice,
             "time_controller_choice": self.time_controller_choice,
             "description": self.description,
-            "id": 0
+            "id": 0,
         }
 
     def display_create_menu(self):
@@ -77,8 +64,11 @@ class CreateTournament:
         self.display_player_choice()
         self.display_time_controller_choice()
         self.display_description()
+        self.display_tournament_informations()
+        self.display_confirm_tournament_save()
 
     def display_tournament_continue(self):
+        clear_screen(1)
         self.console.print(
             "[bold]\nBienvenue dans le menu de création d'un nouveau tournoi.[/bold]"
             "[bold]\nVeuillez remplire correctement les informations suivantes:\n[/bold]"
@@ -87,14 +77,15 @@ class CreateTournament:
             " pour revenir au menu principal[/italic]\n\n"
         )
         response: str = input("Continuer (o/n): ")
+        print(response)
         if response.lower() != "n" and response.lower() != "o":
             self.console.print(display_error("wrong_input_choice_to_continue"))
             clear_screen(1)
-            return self.display_tournament_continue()
+            self.display_tournament_continue()
         elif response.lower() == "o":
-            return self.display_create_menu()
+            self.display_create_menu()
         elif response.lower() == "n":
-            return False
+            TournamentMenu().display_main_menu()
 
     def display_tournament_name(self):
         try:
@@ -153,25 +144,22 @@ class CreateTournament:
 
     def display_player_list(self):
         # add here display limitation
-        n = TournamentController()
-        print(n.get_player_list())
-        if len(self.player_controller.get_players_list()) >= 8:
+        players = TournamentController()
+        if len(players.get_players_list()) >= 8:
             table = Table(title="\n\n[bold]Liste des joueurs à inscrire à ce tournoi[/bold]\n")
             table.add_column("Id", justify="center", style="cyan", no_wrap=True)
             table.add_column("Nom", justify="center", style="white", no_wrap=True)
             table.add_column("Prenom", justify="center", style="white", no_wrap=True)
 
-            for player in self.player_controller.get_players_list():
+            for player in players.get_players_list():
                 table.add_row(
-                    str(player.doc_id),
+                    str(player["id"]),
                     str(player["first_name"]),
                     str(player["last_name"]),
                 )
             self.console.print(table)
 
-        elif (
-            len(self.player_controller.get_players_list()) > 0 and len(self.player_controller.get_players_list()) <= 8
-        ):
+        elif len(players.get_players_list()) > 0 and len(players.get_players_list()) <= 8:
             self.console.print(display_error("too_few_player_created"))
             # redirection here...
         else:
@@ -197,11 +185,11 @@ class CreateTournament:
 
     def display_time_controller_choice(self):
         try:
-            self.time_controller_choice = input("Tournée (blitz / bullet / coup_rapide): ")
+            self.time_controller_choice = input("Tournée (blitz / bullet / coup rapide): ")
             if self.time_controller_choice == "" or not self.time_controller_choice.lower() in [
                 "blitz",
                 "bullet",
-                "coup_rapide",
+                "coup rapide",
             ]:
                 self.console.print(display_error("time_controller_field"))
                 return self.display_time_controller_choice()
@@ -220,10 +208,6 @@ class CreateTournament:
             return self.display_description()
 
     def display_tournament_informations(self):
-        """display_save_tournament
-        save tornament in database
-        """
-        player_controller = PlayerController()
 
         clear_screen(1)
         self.console.print(
@@ -238,10 +222,9 @@ class CreateTournament:
             "[bold green]'o'[/bold green][italic] pour sauvegarder ou [/italic][bold green]'n'[/bold green][italic]"
             "[italic]pour annuler et revenir au menu principal[/italic]\n\n"
         )
-
         print(
             Panel.fit(
-                "[bold]Vos informations[/bold]\n\n"
+                f"[bold]Vos informations[/bold]\n\n"
                 f"[bold green]Nom du tournoi:[/bold green] [bold]{self.tournament_data()['tournament_name']}[/bold]\n"
                 f"[bold green]Lieu du tournoi:[/bold green] [bold]{self.tournament_data()['location']}[/bold]\n"
                 f"[bold green]date début:[/bold green]"
@@ -254,16 +237,17 @@ class CreateTournament:
             )
         )
         if len(self.players_choice) == 8:
+            players = TournamentController()
             selected_players_table = Table(title="\n[bold]Liste des joueurs à inscrire à ce tournoi[/bold]\n")
             selected_players_table.add_column("id", justify="center", style="cyan", no_wrap=True)
             selected_players_table.add_column("Nom de famille", justify="center", style="white", no_wrap=True)
             selected_players_table.add_column("Prenom", justify="center", style="white", no_wrap=True)
-            for i in range(0, len(player_controller.get_players_list())):
-                if player_controller.get_players_list()[i]["doc_id"] in self.players_choice:
+            for i in range(0, len(players.get_players_list())):
+                if players.get_players_list()[i]["id"] in self.players_choice:
                     selected_players_table.add_row(
-                        str(player_controller.get_players_list()[i]["doc_id"]),
-                        str(player_controller.get_players_list()[i]["first_name"]),
-                        str(player_controller.get_players_list()[i]["last_name"]),
+                        str(players.get_players_list()[i]["id"]),
+                        str(players.get_players_list()[i]["first_name"]),
+                        str(players.get_players_list()[i]["last_name"]),
                     )
 
             self.console.print(selected_players_table)
@@ -275,7 +259,7 @@ class CreateTournament:
             return self.display_confirm_tournament_save()
         else:
             if response.lower() == "o":
-                tournament_data = [
+                data = [
                     self.tournament_name,
                     self.location,
                     self.tournament_date_begin,
@@ -284,114 +268,37 @@ class CreateTournament:
                     self.players_choice,
                     self.time_controller_choice,
                     self.description,
-                    self.id
+                    self.id,
                 ]
-                #self.pairing_round = TournamentController(self.tournament_data()).set_pairing_first_round(
-                #    self.players_choice
-                #)
-                tournament_controller_data = TournamentController.save(tournament_data)
+                tournament_controller_data = TournamentController(data)
                 tournament_controller_data.save()
                 self.console.print("[bold]Sauvegarde terminée...[/bold]")
                 clear_screen(1)
-                return self.display_pairing_and_tournament()
+                self.display_confirm_begin_tournament()
             elif response.lower() == "n":
                 self.console.print(
                     "\n[bold]Création annulée,[/bold]" "[bold]vous allez être redirigé vers le menu principal.[/bold]"
                 )
                 clear_screen(1)
+                TournamentMenu().display_main_menu()
             return response.lower()
 
-    def display_pairing_and_tournament(self):
-        self.console.print(
-            "[bold][italic yellow]VOTRE TOURNOIS[/italic yellow][/bold]\n",
-            style=None,
-            justify="center",
-        )
-        # DO : save only last result.
-        if len(self.player_controller.get_players_list()) >= 8:
-            pairing_table = Table(title="\n\n[bold]Paires de début de tournoi[/bold]\n")
-            pairing_table.add_column("Numéro Equipe", justify="center", style="white", no_wrap=True)
-            pairing_table.add_column("Competiteur 1", justify="center", style="white", no_wrap=True)
-            pairing_table.add_column("Competiteur 2", justify="center", style="white", no_wrap=True)
-            for i in range(0, len(self.pairing_round)):
-                print(self.pairing_round)
-                pairing_table.add_row(
-                    f"{i}",
-                    f'{self.pairing_round[i][0]["last_name"]}',
-                    f'{self.pairing_round[i][1]["last_name"]}',
-                )
-            self.console.print(pairing_table)
-            self.display_tournament_begin()
-
-    def display_tournament_begin(self):
-        self.console.print(
-            f"\n[bold]Le tournoi va se dérouler en {self.number_of_round} tours.[/bold]\n"
-            "[bold]Chaque équipes vont s'affronter:[/bold]\n"
-            "un match gagné = 1 point\n"
-            "un match perdu = 0 point\n"
-            "un match nul = 0.5 pour les deux participants."
-        )
-        for tour in range(1, self.number_of_round + 1):
-            choice = 0
-            if tour == 1:
-                self.console.print(f"\n\n[bold]Match {tour}:[/bold]\n")
-
-            else:
-                pairing_table = Table(title="\n\n[bold]Match {tour}:[/bold]\n")
-                pairing_table.add_column("Numéro Equipe", justify="center", style="white", no_wrap=True)
-                pairing_table.add_column("Competiteur 1", justify="center", style="white", no_wrap=True)
-                pairing_table.add_column("Competiteur 2", justify="center", style="white", no_wrap=True)
-                for i in range(0, len(self.pairing_round)):
-                    pairing_table.add_row(
-                        f"{i}",
-                        f'{self.pairing_round[i][0]["last_name"]}',
-                        f'{self.pairing_round[i][1]["last_name"]}',
-                    )
-                self.console.print(pairing_table)
-            # from tuple to list to allow editing
-            self.pairing_round = list(self.pairing_round)
-            for i in range(0, len(self.pairing_round)):
-                self.console.print(
-                    "[bold]Selectionnez la valeur correcte:\n[/bold]"
-                    f"[italic green]1)[/italic green] {self.pairing_round[i][0]['last_name']}\n"
-                    f"[italic green]2)[/italic green] {self.pairing_round[i][1]['last_name']}\n"
-                    "[italic green]3)[/italic green] Match nul\n"
-                )
-                while True:
-                    choice = input("Résultat: ")
-                    if not choice or choice not in ["1", "2", "3"]:
-                        self.console.print(display_error("wrong_match_result_input"))
-                    else:
-                        if choice == "1":
-                            self.console.print(
-                                f"[bold]Le competiteur [/bold]"
-                                f"[bold]{self.pairing_round[i][0]['last_name']} prend 1 point[/bold]"
-                            )
-                            self.pairing_round[i][0]["score"] += 1.0
-                        elif choice == "2":
-                            self.console.print(
-                                f"[bold]Le competiteur [/bold]"
-                                f"[bold]{self.pairing_round[i][1]['last_name']} prend 1 point[/bold]"
-                            )
-                            self.pairing_round[i][1]["score"] += 1.0
-                        elif choice == "3":
-                            self.console.print(
-                                f"[bold]Les competiteurs {self.pairing_round[i][0]['last_name']}[/bold]"
-                                "[bold] et [/bold]"
-                                f"[bold]{self.pairing_round[i][1]['last_name']} prennent 0.5 point[/bold]"
-                            )
-                            self.pairing_round[i][0]["score"] += 0.5
-                            self.pairing_round[i][1]["score"] += 0.5
-                        break
-                # le score doit être mis sur un match
-                # Un match, c'est un truple de liste de 2 joueurs et 2 scores
-                # en fin de match stocker tous les rounds dans TOUR
-                # ex: Tour(match1, match2, match3...)
-                # from tuple to list to allow editing
-
-                self.pairing_round = tuple(self.pairing_round)
-                self.player_controller.update_score(self.pairing_round)
-                self.pairing_round = TournamentController(self.tournament_data()).set_pairing_next_round(
-                    self.players_choice
-                )
-            self.console.print(f"\n\n[bold]Match {i} Terminé[/bold]\n")
+    def display_confirm_begin_tournament(self):
+        response = input("Voulez-vous commencer le tournois ? (o/n): ")
+        if response.lower() != "n" and response.lower() != "o":
+            self.console.print(display_error("wrong_input_choice_to_confirm"))
+            return self.display_confirm_tournament_save()
+        else:
+            if response.lower() == "o":
+                clear_screen(1)
+                # tournament_data = TournamentController().get_tournament_by_name(self.tournament_name)
+                # tournament_model = Tournament(tournament_data).unset_data()
+                # Playmatch(tournament_model).display_tournament_begin()
+                Playmatch(
+                    TournamentController().get_tournament_by_name(self.tournament_name)
+                ).display_tournament_begin()
+            elif response.lower() == "n":
+                self.console.print("\n[bold]vous allez être redirigé vers le menu principal.[/bold]")
+                clear_screen(1)
+                TournamentMenu().display_main_menu()
+            return response.lower()

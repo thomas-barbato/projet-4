@@ -46,6 +46,7 @@ def display_error(category: str):
         "gender": "[italic red]Mauvais choix selectionné[/italic red]"
         "[italic red] veuillez entrer l'un des choix suivants: [/italic red]"
         "[bold red]homme[/bold red][italic red] ou [/italic red][bold red]femme[/bold red]",
+        "tournament_id_unknown": "[italic red]Veuillez entrer une ID valide[/italic red]",
     }[category]
 
 
@@ -55,7 +56,8 @@ def check_date_format(date: str):
         return True
     except ValueError:
         return False
-    
+
+
 def check_birth_date_format(date: str):
     try:
         datetime.datetime.strptime(date, "%d-%m-%Y")

@@ -1,6 +1,7 @@
 """import"""
-from .validation import display_error, check_date_format,check_birth_date_format
+from .validation import display_error, check_date_format, check_birth_date_format
 from .screen_and_sys_func import clear_screen
+from views.menu import TournamentMenu
 from controllers.player_controller import PlayerController
 from rich import print
 from rich.console import Console
@@ -19,11 +20,9 @@ class CreatePlayer:
         self.ranking: int = None
         self.score: float = 0.0
         self.id = 1
-        
+
     def __call__(self):
         self.display_player_create_menu()
-        
-    
 
     def display_player_create_menu(self):
         """display_create_tournament_menu
@@ -45,7 +44,7 @@ class CreatePlayer:
         self.display_player_ranking()
         self.display_player_informations()
         self.display_confirm_player_save()
-        
+
     def display_player_continue(self):
         self.console.print(
             "[bold]\nBienvenue dans le menu d'inscription d'un nouveau joueur.[/bold]"
@@ -62,9 +61,8 @@ class CreatePlayer:
         elif response.lower() == "o":
             return self.display_player_create_menu()
         elif response.lower() == "n":
-            return False
-        
-    
+            TournamentMenu().display_main_menu()
+
     def display_player_last_name(self):
         try:
             self.last_name = input("\n\nNom du joueur: ")
@@ -76,8 +74,7 @@ class CreatePlayer:
         except ValueError:
             self.console.print(display_error("empty_field"))
             return self.display_player_last_name()
-        
-    
+
     def display_player_first_name(self):
         try:
             self.first_name = input("\n\nPrenom du joueur: ")
@@ -125,35 +122,36 @@ class CreatePlayer:
         else:
             # default value
             self.ranking = 0
-            
-    def display_player_informations(self):
-            """display_save_tournament
-            save tornament in database
-            """
-            clear_screen(1)
-            self.console.print(
-                "[bold][italic yellow]CONFIRMER L'INSCRIPTION DE VOTRE JOUEUR[/italic yellow][/bold]\n",
-                style=None,
-                justify="center",
-            )
-            print(
-                "[bold]\nDernière étape avant la création d'inscrire votre joueur[/bold]"
-                "[bold] Veuillez vérifier que les informations entrées sont correctes.\n[/bold]"
-                "[italic]Appuyez sur [/italic]"
-                "[bold green]'o'[/bold green][italic] pour sauvegarder ou [/italic][bold green]'n'[/bold green][italic]"
-                "[italic]pour annuler et revenir au menu principal[/italic]\n\n"
-            )
 
-            print(
-                Panel.fit("[bold]Vos informations[/bold]\n\n"
-                    f"[bold green]Nom:[/bold green] [bold]{self.last_name}[/bold]\n"
-                    f"[bold green]Prénom:[/bold green] [bold]{self.first_name}[/bold]\n"
-                    f"[bold green]Date de naissance:[/bold green] [bold]{self.date_of_birth}[/bold]\n"
-                    f"[bold green]Sexe:[/bold green] [bold]{self.gender}[/bold]\n"
-                    f"[bold green]Rang:[/bold green] [bold]{self.ranking}[/bold]\n",
-                    border_style="red",)
+    def display_player_informations(self):
+        """display_save_tournament
+        save tornament in database
+        """
+        clear_screen(1)
+        self.console.print(
+            "[bold][italic yellow]CONFIRMER L'INSCRIPTION DE VOTRE JOUEUR[/italic yellow][/bold]\n",
+            style=None,
+            justify="center",
+        )
+        print(
+            "[bold]\nDernière étape avant la création d'inscrire votre joueur[/bold]"
+            "[bold] Veuillez vérifier que les informations entrées sont correctes.\n[/bold]"
+            "[italic]Appuyez sur [/italic]"
+            "[bold green]'o'[/bold green][italic] pour sauvegarder ou [/italic][bold green]'n'[/bold green][italic]"
+            "[italic]pour annuler et revenir au menu principal[/italic]\n\n"
+        )
+
+        print(
+            Panel.fit(
+                "[bold]Vos informations[/bold]\n\n"
+                f"[bold green]Nom:[/bold green] [bold]{self.last_name}[/bold]\n"
+                f"[bold green]Prénom:[/bold green] [bold]{self.first_name}[/bold]\n"
+                f"[bold green]Date de naissance:[/bold green] [bold]{self.date_of_birth}[/bold]\n"
+                f"[bold green]Sexe:[/bold green] [bold]{self.gender}[/bold]\n"
+                f"[bold green]Rang:[/bold green] [bold]{self.ranking}[/bold]\n",
+                border_style="red",
             )
-            
+        )
 
     def display_confirm_player_save(self):
         response = input("Confirmez les informations à sauvegarder (o/n): ")
@@ -163,17 +161,18 @@ class CreatePlayer:
         else:
             if response.lower() == "o":
                 player_controller_data = PlayerController()
-                player_controller_data.save([
-                    self.first_name,
-                    self.last_name,
-                    self.date_of_birth,
-                    self.gender,
-                    self.ranking,
-                    self.score,
-                    self.id,
-                ])
+                player_controller_data.save(
+                    [
+                        self.first_name,
+                        self.last_name,
+                        self.date_of_birth,
+                        self.gender,
+                        self.ranking,
+                        self.score,
+                        self.id,
+                    ]
+                )
                 self.console.print("[bold]Sauvegarde terminée...[/bold]")
-                player_controller_data = ""
                 clear_screen(1)
                 self.display_confirm_create_another_player()
             elif response.lower() == "n":
@@ -181,8 +180,7 @@ class CreatePlayer:
                     "\n[bold]Création annulée,[/bold]" "[bold]vous allez être redirigé vers le menu principal.[/bold]"
                 )
                 clear_screen(1)
-            return response.lower()
-            
+                TournamentMenu().display_main_menu()
 
     def display_confirm_create_another_player(self):
         response = input("Inscrire un nouveau joueur ? (o/n): ")
@@ -198,4 +196,4 @@ class CreatePlayer:
                     "\n[bold]Création annulée,[/bold]" "[bold]vous allez être redirigé vers le menu principal.[/bold]"
                 )
                 clear_screen(1)
-                return response.lower()
+                TournamentMenu().display_main_menu()

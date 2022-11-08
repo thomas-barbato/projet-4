@@ -8,9 +8,6 @@ class PlayerController:
         self.player_model = Player()
         self.db = TinyDB("db_chess.json")
 
-    def get_players_list(self):
-        return Player().display_data()
-
     def update_score(self, id_list: list):
         # print(id_list)
         for player in id_list:
@@ -28,16 +25,14 @@ class PlayerController:
         # sort list by ranking or score
         players_data = sorted(self.db.table("players").all(), key=lambda d: d[parameter], reverse=True)
         # return dict from previous list
-        return {
-            i: {
+        return [
+            {
                 "first_name": players_data[i]["first_name"],
                 "last_name": players_data[i]["last_name"],
                 "ranking": players_data[i]["ranking"],
                 "score": players_data[i]["score"],
+                "id": players_data[i]["id"],
             }
             for i in range(0, len(players_data))
-            if players_data[i].doc_id in id_list
-        }
-
-
-print(Player().display_data())
+            if players_data[i]["id"] in id_list
+        ]

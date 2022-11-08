@@ -1,7 +1,5 @@
 """import"""
 # sys.path.insert(1, os.path.join(sys.path[0], ".."))
-from .create_tournament_view import CreateTournament
-from .create_player_view import CreatePlayer
 from .screen_and_sys_func import clear_screen, exit_to_console
 from .validation import display_error
 from rich import print, pretty
@@ -19,7 +17,6 @@ class TournamentMenu:
     ):
         pretty.install()
         self.console = Console(width=100)
-        self.display_main_menu()
 
     def display_main_menu(self):
         """display_main_menu
@@ -52,6 +49,21 @@ class TournamentMenu:
         try:
             menu_choices = int(input("Entrez votre choix: "))
             if menu_choices in [1, 2, 3, 4, 5]:
+                if menu_choices == 5:
+                    clear_screen(0)
+                    self.console.print("[italic red]Le programme va maintenant se terminer, à bientot.[/italic red]")
+                return menu_choices
+            else:
+                self.console.print(display_error("main_choice_value"))
+                clear_screen(1)
+                self.display_menu_choices()
+        except ValueError:
+            self.console.print(display_error("main_choice_type"))
+            clear_screen(1)
+            self.display_menu_choices()
+        """try:
+            menu_choices = int(input("Entrez votre choix: "))
+            if menu_choices in [1, 2, 3, 4, 5]:
                 if menu_choices == 1:
                     createTournament = CreateTournament()
                     if createTournament.display_tournament_continue() is False:
@@ -67,7 +79,7 @@ class TournamentMenu:
                     if createPlayer.display_confirm_create_another_player() == "n":
                         return self.display_menu_choices()
                 elif menu_choices == 3:
-                    pass
+                    displayTournament = Playmatch().display_all_tournaments()
                 elif menu_choices == 4:
                     pass
                 elif menu_choices == 5:
@@ -80,4 +92,4 @@ class TournamentMenu:
         except ValueError:
             self.console.print(display_error("main_choice_type"))
             clear_screen(1)
-            self.display_menu_choices()
+            self.display_menu_choices()"""

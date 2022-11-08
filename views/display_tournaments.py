@@ -1,57 +1,71 @@
-"""def display_create_tournament_view(self):
-    controller_data = TournamentController()
-    self.console.print(
-        "[bold][italic yellow]CONSULTER LES TOURNOIS CRÉÉS[/italic yellow][/bold]\n",
-        style=None,
-        justify="center",
-    )
-    if len(controller_data.get_tournament_list()) >= 1:
-        table = Table(title="")
-        table.add_column("id", justify="center", style="green", no_wrap=False)
-        table.add_column("nom", justify="center", style="cyan", no_wrap=False)
-        table.add_column("lieu", justify="center", style="cyan", no_wrap=False)
-        table.add_column("date_debut", justify="center", style="cyan", no_wrap=False)
-        table.add_column("date_fin", justify="center", style="cyan", no_wrap=False)
-        table.add_column("nbr_tour", justify="center", style="cyan", no_wrap=False)
-        table.add_column("nbr_manche", justify="center", style="cyan", no_wrap=False)
-        table.add_column("time", justify="center", style="cyan", no_wrap=False)
-        table.add_column("joueurs", justify="center", style="cyan", no_wrap=False)
-        table.add_column("description", justify="center", style="cyan", no_wrap=False)
+"""import"""
+from .validation import display_error, check_date_format
+from .screen_and_sys_func import clear_screen
+from .play_match_view import Playmatch
+from models.tables import Tournament
+from controllers.tournament_controller import TournamentController
+from controllers.player_controller import PlayerController
+from rich import print
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+import re
 
-        for tournament in controller_data.get_tournament_list():
-            table.add_row(
-                str(tournament["id"]),
-                str(tournament["name"]),
-                str(tournament["location"]),
-                str(tournament["tournament_date_begin"]),
-                str(tournament["tournament_date_end"]),
-                str(tournament["number_of_round"]),
-                str(tournament["time_controller_choice"]),
-                str(tournament["players_list"]),
-                str(tournament["description"]),
-            )
 
-        self.console.print(table)
+class DisplayTournaments:
+    def __init__(self):
+        self.selected_tournament_id = None
+        self.console = Console()
+
+    def display_all_tournaments(self):
+        tournament_list = TournamentController().get_all_tournaments()
         self.console.print(
-            "[italic]\n\nAppuyez sur [/italic]"
-            "[bold green]'o'[/bold green][italic] pour revenir au menu ou [/italic]"
-            "[bold green]'q'[/bold green][italic]"
-            " pour quitter[/italic]\n\n"
+            "[bold][italic yellow]VOS TOURNOIS[/italic yellow][/bold]\n",
+            style=None,
+            justify="center",
         )
-        while True:
-            response = input("Reponse (o / q): ")
-            if response.lower() != "q" and response.lower() != "o":
-                self.console.print(display_error("wrong_input_choice_to_save"))
-            elif response.lower() == "o":
-                self.console.print("[bold]vous allez être redirigé vers le menu principal.[/bold]")
-                clear_screen(1)
-                return self.display_main_menu()
-            elif response.lower() == "q":
-                self.console.print("[bold]Le programme va maintenant se terminer, à très bientôt.\n[/bold]")
-                clear_screen(1)
-                return exit_to_console(0)
-    else:
-        self.console.print(display_error("no_tournament_created"))
-        clear_screen(1)
-        return self.display_create_menu()
-"""
+        tournament_table = Table()
+        tournament_table.add_column("id", justify="center", style="green", no_wrap=True)
+        tournament_table.add_column("name", justify="center", style="white", no_wrap=True)
+        tournament_table.add_column("lieu", justify="center", style="white", no_wrap=True)
+        tournament_table.add_column("date début", justify="center", style="white", no_wrap=True)
+        tournament_table.add_column("date fin", justify="center", style="white", no_wrap=True)
+        tournament_table.add_column("nombre de tours", justify="center", style="white", no_wrap=True)
+        tournament_table.add_column("liste des joueurs", justify="center", style="white", no_wrap=False)
+        tournament_table.add_column("control du temps", justify="center", style="white", no_wrap=True)
+        tournament_table.add_column("description", justify="center", style="white", no_wrap=True)
+        for tournament in tournament_list:
+            player_list = TournamentController(tournament).get_players_name_by_tournament_id(tournament["id"])
+            tournament_table.add_row(
+                str(tournament["id"]),
+                tournament["tournament_name"],
+                tournament["location"],
+                tournament["tournament_date_begin"],
+                tournament["tournament_date_end"],
+                str(tournament["number_of_round"]),
+                player_list,
+                tournament["time_controller_choice"],
+                tournament["description"],
+            )
+        print(tournament_table)
+        self.select_tournament()
+
+    def select_tournament(self):
+        try:
+            self.tournament_id = input("\n\nselectionnez un identifiant (id): ")
+            if not self.tournament_id:
+                self.console.print(display_error("empty_field"))
+                return self.select_tournament()
+            else:
+                if TournamentController().check_if_tournament_id_exists(int(self.tournament_id)) is True:
+
+                    tournament_data = TournamentController().get_tournament_by_id(int(self.tournament_id))
+                    tournament_model_instance = Tournament(tournament_data).unset_data(tournament_data)
+                    return Playmatch(tournament_model_instance).display_tournament_begin()
+                    # return Playmatch(TournamentController().get_tournament_by_id(int(self.tournament_id))).display_tournament_begin()
+                else:
+                    self.console.print(display_error("tournament_id_unknown"))
+                    return self.select_tournament()
+        except ValueError:
+            self.console.print(display_error("empty_field"))
+            return self.select_tournament()
