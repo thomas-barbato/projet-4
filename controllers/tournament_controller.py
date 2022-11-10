@@ -2,7 +2,7 @@
 import os
 import sys
 from tinydb import TinyDB, Query
-from models.tables import Tournament, Player
+from models.tables import Tournament, Player, Tour
 from controllers.player_controller import PlayerController
 
 
@@ -29,10 +29,6 @@ class TournamentController:
     def get_all_tournaments(self):
         return self.tournament_model.display_tournament_data()
 
-    def get_tournament_list(self, tournament_name=None):
-        id = self.get_tournament_by_name(tournament_name)
-        return self.tournament_model.display_tournament_data(id)
-
     def check_if_tournament_id_exists(self, id):
         return self.tournament_model.check_id(id)
 
@@ -51,34 +47,6 @@ class TournamentController:
         )
         return format_result
 
-    def _set_teams(self, player_id_list: list, parameter):
-        # players_list = sorted(self.player_model.display_data(), key=lambda d: d[parameter], reverse=True)
-        player_list = self.playerController.get_players_by_parameters(player_id_list, parameter)
-        first_team: dict = []
-        second_team: dict = []
-        for i in range(0, len(player_list.keys())):
-            if i % 2 == 0:
-                first_team.append(
-                    {
-                        "first_name": player_list[i]["first_name"],
-                        "last_name": player_list[i]["last_name"],
-                        "ranking": player_list[i]["ranking"],
-                        "score": player_list[i]["score"],
-                        "id": player_list[i]["id"],
-                    }
-                )
-            else:
-                second_team.append(
-                    {
-                        "first_name": player_list[i]["first_name"],
-                        "last_name": player_list[i]["last_name"],
-                        "ranking": player_list[i]["ranking"],
-                        "score": player_list[i]["score"],
-                        "id": player_list[i]["id"],
-                    }
-                )
-        return first_team, second_team
-
     def set_pairing_first_round(self, player_id_list: list):
         first_team, second_team = self._set_teams(player_id_list, "ranking")
         self.pairing = tuple(zip(first_team, second_team))
@@ -90,3 +58,20 @@ class TournamentController:
         first_team, second_team = self._set_teams(player_id_list, "score")
         self.pairing = tuple(zip(first_team, second_team))
         return self.pairing
+
+    def save_current_tour(self, tournament_object, tour_object):
+        tour = tour_object.set_data()
+        tour_data = {}
+        tour_data["time_begin"] = tour["time_begin"]
+        tour_data["time_end"] = tour["time_end"]
+        tour_data["list_of_completed_matchs"] = tour["list_of_completed_matchs"]
+        Tour().save(tour_data)
+        tour_id = Tour().get_tour_id(tour_data)
+
+        tournament_data = tournament_object.set_data()
+        tournament_data["round_ids"].append(int(tour_id))
+        update_tournament = Tournament().unset_data(tournament_data)
+        update_tournament.update(tournament_data)
+
+    def save_current_round(self, tournament_data):
+        pass

@@ -46,6 +46,7 @@ class CreatePlayer:
         self.display_confirm_player_save()
 
     def display_player_continue(self):
+        clear_screen(0)
         self.console.print(
             "[bold]\nBienvenue dans le menu d'inscription d'un nouveau joueur.[/bold]"
             "[bold]\nVeuillez remplire correctement les informations suivantes:\n[/bold]"
@@ -54,14 +55,14 @@ class CreatePlayer:
             " pour revenir au menu principal[/italic]\n\n"
         )
         response: str = input("Continuer (o/n): ")
-        if response.lower() != "n" and response.lower() != "o":
+        if not response.lower() in ["o", "n"]:
             self.console.print(display_error("wrong_input_choice_to_continue"))
             clear_screen(1)
             return self.display_player_continue()
         elif response.lower() == "o":
             return self.display_player_create_menu()
         elif response.lower() == "n":
-            TournamentMenu().display_main_menu()
+            TournamentMenu().display_menu_choices()
 
     def display_player_last_name(self):
         try:
@@ -180,7 +181,7 @@ class CreatePlayer:
                     "\n[bold]Création annulée,[/bold]" "[bold]vous allez être redirigé vers le menu principal.[/bold]"
                 )
                 clear_screen(1)
-                TournamentMenu().display_main_menu()
+                TournamentMenu().display_menu_choices()
 
     def display_confirm_create_another_player(self):
         response = input("Inscrire un nouveau joueur ? (o/n): ")
@@ -196,4 +197,4 @@ class CreatePlayer:
                     "\n[bold]Création annulée,[/bold]" "[bold]vous allez être redirigé vers le menu principal.[/bold]"
                 )
                 clear_screen(1)
-                TournamentMenu().display_main_menu()
+                TournamentMenu().display_menu_choices()

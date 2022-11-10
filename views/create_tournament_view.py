@@ -2,6 +2,7 @@
 from .validation import display_error, check_date_format
 from .screen_and_sys_func import clear_screen
 from views.menu import TournamentMenu
+from views.create_player_view import CreatePlayer
 from views.play_match_view import Playmatch
 from controllers.tournament_controller import TournamentController
 from controllers.player_controller import PlayerController
@@ -26,6 +27,7 @@ class CreateTournament:
         self.players_choice: list = []
         self.time_controller_choice: str = ""
         self.description: str = ""
+        self.round_ids: list = []
         self.id = 1
         self.pairing_round: tuple = ()
 
@@ -39,7 +41,8 @@ class CreateTournament:
             "players_choice": self.players_choice,
             "time_controller_choice": self.time_controller_choice,
             "description": self.description,
-            "id": 0,
+            "round_ids": self.round_ids,
+            "id": self.id,
         }
 
     def display_create_menu(self):
@@ -77,15 +80,14 @@ class CreateTournament:
             " pour revenir au menu principal[/italic]\n\n"
         )
         response: str = input("Continuer (o/n): ")
-        print(response)
-        if response.lower() != "n" and response.lower() != "o":
+        if not response.lower() in ["o", "n"]:
             self.console.print(display_error("wrong_input_choice_to_continue"))
             clear_screen(1)
             self.display_tournament_continue()
         elif response.lower() == "o":
             self.display_create_menu()
         elif response.lower() == "n":
-            TournamentMenu().display_main_menu()
+            TournamentMenu().display_menu_choices()
 
     def display_tournament_name(self):
         try:
@@ -161,10 +163,10 @@ class CreateTournament:
 
         elif len(players.get_players_list()) > 0 and len(players.get_players_list()) <= 8:
             self.console.print(display_error("too_few_player_created"))
-            # redirection here...
+            return CreatePlayer().display_player_continue()
         else:
             self.console.print(display_error("no_player_created"))
-            # redirection here...
+            return CreatePlayer().display_player_continue()
 
     def display_player_choice(self):
         self.console.print(
@@ -268,6 +270,7 @@ class CreateTournament:
                     self.players_choice,
                     self.time_controller_choice,
                     self.description,
+                    self.round_ids,
                     self.id,
                 ]
                 tournament_controller_data = TournamentController(data)
@@ -280,7 +283,7 @@ class CreateTournament:
                     "\n[bold]Création annulée,[/bold]" "[bold]vous allez être redirigé vers le menu principal.[/bold]"
                 )
                 clear_screen(1)
-                TournamentMenu().display_main_menu()
+                TournamentMenu().display_menu_choices()
             return response.lower()
 
     def display_confirm_begin_tournament(self):
@@ -291,14 +294,11 @@ class CreateTournament:
         else:
             if response.lower() == "o":
                 clear_screen(1)
-                # tournament_data = TournamentController().get_tournament_by_name(self.tournament_name)
-                # tournament_model = Tournament(tournament_data).unset_data()
-                # Playmatch(tournament_model).display_tournament_begin()
-                Playmatch(
-                    TournamentController().get_tournament_by_name(self.tournament_name)
-                ).display_tournament_begin()
+                tournament_data = TournamentController().get_tournament_by_name(self.tournament_name)
+                tournament_model_instance = Tournament(tournament_data).unset_data(tournament_data)
+                return Playmatch(tournament_model_instance).display_tournament_begin()
             elif response.lower() == "n":
                 self.console.print("\n[bold]vous allez être redirigé vers le menu principal.[/bold]")
                 clear_screen(1)
-                TournamentMenu().display_main_menu()
+                TournamentMenu().display_menu_choices()
             return response.lower()

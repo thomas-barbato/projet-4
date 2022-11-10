@@ -14,22 +14,24 @@ from rich.table import Table
 
 class MainController:
     def __init__(self):
-        self.menu = TournamentMenu()
+        self.display_menu = TournamentMenu()
         self.create_player_view = CreatePlayer()
         self.create_tournament_view = CreateTournament()
         self.display_tournaments = DisplayTournaments()
         self.display_players = DisplayPlayers()
-        self.select_menu_choice()
+        self.console = Console()
 
     def select_menu_choice(self):
-        selected = self.menu.display_menu_choices()
-        if selected == 1:
+        selected = self.display_menu.display_menu_choices()
+        if selected == "1":
             return self.create_tournament_view.display_tournament_continue()
-        elif selected == 2:
+        elif selected == "2":
             return self.create_player_view.display_player_continue()
-        elif selected == 3:
+        elif selected == "3":
             return self.display_tournaments.display_all_tournaments()
-        elif selected == 4:
+        elif selected == "4":
             return self.display_players.display_all_players()
-        elif selected == 5:
+        elif selected == "5":
+            clear_screen(0)
+            self.console.print("[italic red]Le programme va maintenant se terminer, à bientot.[/italic red]")
             exit_to_console(0)
