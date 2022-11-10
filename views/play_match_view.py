@@ -96,10 +96,10 @@ class Playmatch:
         # if it's empty : take 1
         # else : number of round - len of round_ids
         count_tour_already_completed = (
-            self.tournament_object_editable_data["number_of_round"]
+            int(self.tournament_object_editable_data["number_of_round"])
             - len(self.tournament_object_editable_data["round_ids"])
             if len(self.tournament_object_editable_data["round_ids"]) > 0
-            else self.tournament_object_editable_data["number_of_round"]
+            else int(self.tournament_object_editable_data["number_of_round"])
         )
         # delete or not, i will see.
         self.tour_model.NUMBER_OF_TOUR = len(self.tournament_object_editable_data["round_ids"]) if len(self.tournament_object_editable_data["round_ids"]) > 0 else 1

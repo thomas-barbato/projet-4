@@ -94,7 +94,7 @@ class DisplayTournaments:
                 if TournamentController().check_if_tournament_id_exists(int(self.tournament_id)) is True:
                     tournament_data = TournamentController().get_tournament_by_id(int(self.tournament_id))
                     tournament_model_instance = Tournament(tournament_data).unset_data(tournament_data)
-                    if len(tournament_data["round_ids"]) >= tournament_data["number_of_round"]:
+                    if len(tournament_data["round_ids"]) >= int(tournament_data["number_of_round"]):
                         self.display_tournament_data_continue(tournament_model_instance)
                     else:        
                         return Playmatch(tournament_model_instance).display_tournament_begin()
