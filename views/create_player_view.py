@@ -1,13 +1,11 @@
 """import"""
-from .validation import display_error, check_date_format, check_birth_date_format
+from .validation import display_error, check_birth_date_format
 from .screen_and_sys_func import clear_screen
 from views.menu import TournamentMenu
 from controllers.player_controller import PlayerController
 from rich import print
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
-import re
 
 
 class CreatePlayer:

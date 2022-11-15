@@ -1,6 +1,5 @@
 """import"""
-# sys.path.insert(1, os.path.join(sys.path[0], ".."))
-from .screen_and_sys_func import clear_screen, exit_to_console
+from .screen_and_sys_func import clear_screen
 from .validation import display_error
 from rich import print, pretty
 from rich.console import Console

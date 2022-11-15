@@ -1,8 +1,6 @@
 """import"""
-import os
-import sys
 from tinydb import TinyDB, Query
-from models.tables import Tournament, Player, Tour
+from models.tables import Tournament, Player, Round
 from controllers.player_controller import PlayerController
 
 
@@ -47,31 +45,18 @@ class TournamentController:
         )
         return format_result
 
-    def set_pairing_first_round(self, player_id_list: list):
-        first_team, second_team = self._set_teams(player_id_list, "ranking")
-        self.pairing = tuple(zip(first_team, second_team))
-        return self.pairing
+    # need to format data to be able to add in in json.
+    def save_current_round(self, tournament_object, round_object_list):
+        round_list = []
+        tournament_data = tournament_object
+        for round in round_object_list[0].list_of_completed_matchs:
+            player_1 = round[0][0]
+            player_2 = round[1][0]
+            round_list.append([[player_1.id, round[0][1]], [player_2.id, round[1][1]]])
 
-    # change here , from player table to data sended list.
-    # to be able to change score from tournament to another tournament
-    def set_pairing_next_round(self, player_id_list: list):
-        first_team, second_team = self._set_teams(player_id_list, "score")
-        self.pairing = tuple(zip(first_team, second_team))
-        return self.pairing
-
-    def save_current_tour(self, tournament_object, tour_object):
-        tour = tour_object.set_data()
-        tour_data = {}
-        tour_data["time_begin"] = tour["time_begin"]
-        tour_data["time_end"] = tour["time_end"]
-        tour_data["list_of_completed_matchs"] = tour["list_of_completed_matchs"]
-        Tour().save(tour_data)
-        tour_id = Tour().get_tour_id(tour_data)
-
-        tournament_data = tournament_object.set_data()
-        tournament_data["round_ids"].append(int(tour_id))
+        Round(round_object_list[0].time_begin, round_object_list[0].time_end, round_list).save()
+        round_id = Round(round_object_list[0].time_begin, round_object_list[0].time_end, round_list).get_round_id()
+        tournament_data["rounds"].append(round_id)
         update_tournament = Tournament().unset_data(tournament_data)
         update_tournament.update(tournament_data)
-
-    def save_current_round(self, tournament_data):
-        pass
+        round_list.clear()

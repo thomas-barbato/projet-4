@@ -1,16 +1,13 @@
 """import"""
-from .validation import display_error, check_date_format
+from .validation import display_error
 from .screen_and_sys_func import clear_screen
 from .play_match_view import Playmatch
 from .menu import TournamentMenu
 from models.tables import Tournament
 from controllers.tournament_controller import TournamentController
-from controllers.player_controller import PlayerController
 from rich import print
 from rich.console import Console
-from rich.panel import Panel
 from rich.table import Table
-import re
 
 
 class DisplayTournaments:
@@ -70,7 +67,9 @@ class DisplayTournaments:
         tournament_table.add_column("liste des joueurs", justify="center", style="white", no_wrap=False)
         tournament_table.add_column("control du temps", justify="center", style="white", no_wrap=True)
         tournament_table.add_column("description", justify="center", style="white", no_wrap=True)
-        player_list = TournamentController(selected_tournament).get_players_name_by_tournament_id(selected_tournament["id"])
+        player_list = TournamentController(selected_tournament).get_players_name_by_tournament_id(
+            selected_tournament["id"]
+        )
         tournament_table.add_row(
             str(selected_tournament["id"]),
             selected_tournament["tournament_name"],
@@ -86,7 +85,7 @@ class DisplayTournaments:
 
     def select_tournament(self):
         try:
-            self.tournament_id = input("\n\nselectionnez un identifiant (id): ")
+            self.tournament_id = input("\n\nSelectionnez un identifiant (id): ")
             if not self.tournament_id:
                 self.console.print(display_error("empty_field"))
                 return self.select_tournament()
@@ -94,9 +93,9 @@ class DisplayTournaments:
                 if TournamentController().check_if_tournament_id_exists(int(self.tournament_id)) is True:
                     tournament_data = TournamentController().get_tournament_by_id(int(self.tournament_id))
                     tournament_model_instance = Tournament(tournament_data).unset_data(tournament_data)
-                    if len(tournament_data["round_ids"]) >= int(tournament_data["number_of_round"]):
+                    if len(tournament_data["rounds"]) == int(tournament_data["number_of_round"]):
                         self.display_tournament_data_continue(tournament_model_instance)
-                    else:        
+                    else:
                         return Playmatch(tournament_model_instance).display_tournament_begin()
                 else:
                     self.console.print(display_error("tournament_id_unknown"))

@@ -5,9 +5,7 @@ from views.menu import TournamentMenu
 from views.create_player_view import CreatePlayer
 from views.play_match_view import Playmatch
 from controllers.tournament_controller import TournamentController
-from controllers.player_controller import PlayerController
 from models.tables import Tournament
-from rich import print
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -27,7 +25,7 @@ class CreateTournament:
         self.players_choice: list = []
         self.time_controller_choice: str = ""
         self.description: str = ""
-        self.round_ids: list = []
+        self.rounds: list = []
         self.id = 1
         self.pairing_round: tuple = ()
 
@@ -41,7 +39,7 @@ class CreateTournament:
             "players_choice": self.players_choice,
             "time_controller_choice": self.time_controller_choice,
             "description": self.description,
-            "round_ids": self.round_ids,
+            "rounds": self.rounds,
             "id": self.id,
         }
 
@@ -217,14 +215,14 @@ class CreateTournament:
             style=None,
             justify="center",
         )
-        print(
+        self.console.print(
             "[bold]\nDernière étape avant la création de votre nouveau tournois[/bold]"
             "[bold] Veuillez vérifier que les informations entrées sont correctes.\n[/bold]"
             "[italic]Appuyez sur [/italic]"
             "[bold green]'o'[/bold green][italic] pour sauvegarder ou [/italic][bold green]'n'[/bold green][italic]"
             "[italic]pour annuler et revenir au menu principal[/italic]\n\n"
         )
-        print(
+        self.console.print(
             Panel.fit(
                 f"[bold]Vos informations[/bold]\n\n"
                 f"[bold green]Nom du tournoi:[/bold green] [bold]{self.tournament_data()['tournament_name']}[/bold]\n"
@@ -244,12 +242,13 @@ class CreateTournament:
             selected_players_table.add_column("id", justify="center", style="cyan", no_wrap=True)
             selected_players_table.add_column("Nom de famille", justify="center", style="white", no_wrap=True)
             selected_players_table.add_column("Prenom", justify="center", style="white", no_wrap=True)
-            for i in range(0, len(players.get_players_list())):
-                if players.get_players_list()[i]["id"] in self.players_choice:
+            player_list = players.get_players_list()
+            for player in player_list:
+                if player["id"] in self.players_choice:
                     selected_players_table.add_row(
-                        str(players.get_players_list()[i]["id"]),
-                        str(players.get_players_list()[i]["first_name"]),
-                        str(players.get_players_list()[i]["last_name"]),
+                        str(player["id"]),
+                        player["first_name"],
+                        player["last_name"],
                     )
 
             self.console.print(selected_players_table)
@@ -270,7 +269,7 @@ class CreateTournament:
                     self.players_choice,
                     self.time_controller_choice,
                     self.description,
-                    self.round_ids,
+                    self.rounds,
                     self.id,
                 ]
                 tournament_controller_data = TournamentController(data)

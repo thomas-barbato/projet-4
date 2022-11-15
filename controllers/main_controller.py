@@ -1,15 +1,11 @@
 from views.menu import TournamentMenu
-from views.play_match_view import Playmatch
 from views.screen_and_sys_func import clear_screen, exit_to_console
-from views.validation import display_error
 from views.create_player_view import CreatePlayer
 from views.create_tournament_view import CreateTournament
 from views.display_tournaments import DisplayTournaments
 from views.display_players import DisplayPlayers
 from rich import print
 from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
 
 
 class MainController:

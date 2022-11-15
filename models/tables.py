@@ -1,6 +1,5 @@
 """import"""
-from tinydb import TinyDB, Query, where
-from enum import Enum
+from tinydb import TinyDB, Query
 from datetime import datetime
 import pytz
 
@@ -60,6 +59,20 @@ class Player(Table):
 
         return Player(first_name, last_name, date_of_birth, gender, ranking, score, id)
 
+    def update(self, player_data):
+        self.table.update(
+            {
+                "first_name": player_data["first_name"],
+                "last_name": player_data["last_name"],
+                "date_of_birth": player_data["date_of_birth"],
+                "gender": player_data["gender"],
+                "ranking": player_data["ranking"],
+                "score": player_data["score"],
+                "id": player_data["id"],
+            },
+            Query().id == player_data["id"],
+        )
+
     def save(self, player_data):
         new_player_id = self.table.insert(
             {
@@ -73,6 +86,19 @@ class Player(Table):
             }
         )
         self.table.update({"id": new_player_id}, doc_ids=[new_player_id])
+
+    def get_player_by_id(self, id):
+        query = db.table("players").search(Query().id == int(id))
+        result = {}
+        result["first_name"] = query[0]["first_name"]
+        result["last_name"] = query[0]["last_name"]
+        result["date_of_birth"] = query[0]["date_of_birth"]
+        result["gender"] = query[0]["gender"]
+        result["ranking"] = query[0]["ranking"]
+        result["score"] = query[0]["score"]
+        result["id"] = query[0]["id"]
+
+        return result
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} est classé {self.ranking}\
@@ -90,7 +116,7 @@ class Tournament(Table):
         players_choice=None,
         time_controller_choice=None,
         description=None,
-        round_ids=None,
+        rounds=None,
         id=None,
     ):
         self.table = "tournaments"
@@ -102,7 +128,7 @@ class Tournament(Table):
         self.players_choice: list = players_choice
         self.time_controller_choice: str = time_controller_choice
         self.description: str = description
-        self.round_ids: list = round_ids
+        self.rounds: list = rounds
         self.id: int = id
         self.table = db.table(self.table)
 
@@ -117,7 +143,7 @@ class Tournament(Table):
             "players_choice": self.players_choice,
             "time_controller_choice": self.time_controller_choice,
             "description": self.description,
-            "round_ids": self.round_ids,
+            "rounds": self.rounds,
             "id": self.id,
         }
 
@@ -131,7 +157,7 @@ class Tournament(Table):
         players_choice: list = data["players_choice"]
         time_controller_choice: str = data["time_controller_choice"]
         description: str = data["description"]
-        round_ids: list = data["round_ids"]
+        rounds: list = data["rounds"]
         id: int = data["id"]
 
         return Tournament(
@@ -143,7 +169,7 @@ class Tournament(Table):
             players_choice,
             time_controller_choice,
             description,
-            round_ids,
+            rounds,
             id,
         )
 
@@ -157,8 +183,8 @@ class Tournament(Table):
                 "number_of_round": tournament_data[4],
                 "players_choice": tournament_data[5],
                 "time_controller_choice": tournament_data[6],
-                "description": tournament_data[7],
-                "round_ids": tournament_data[8],
+                "description": tournament_data[7] if tournament_data[7] != "" else "vide",
+                "rounds": tournament_data[8],
                 "id": tournament_data[9],
             }
         )
@@ -174,7 +200,7 @@ class Tournament(Table):
                 "number_of_round": tournament_data["number_of_round"],
                 "players_choice": tournament_data["players_choice"],
                 "time_controller_choice": tournament_data["time_controller_choice"],
-                "round_ids": tournament_data["round_ids"],
+                "rounds": tournament_data["rounds"],
                 "description": tournament_data["description"],
             },
             Query().id == tournament_data["id"],
@@ -191,7 +217,7 @@ class Tournament(Table):
         result["players_choice"] = query[0]["players_choice"]
         result["time_controller_choice"] = query[0]["time_controller_choice"]
         result["description"] = query[0]["description"]
-        result["round_ids"] = query[0]["round_ids"]
+        result["rounds"] = query[0]["rounds"]
         result["id"] = query[0]["id"]
 
         return result
@@ -207,7 +233,7 @@ class Tournament(Table):
         result["players_choice"] = query[0]["players_choice"]
         result["time_controller_choice"] = query[0]["time_controller_choice"]
         result["description"] = query[0]["description"]
-        result["round_ids"] = query[0]["round_ids"]
+        result["rounds"] = query[0]["rounds"]
         result["id"] = query[0]["id"]
 
         return result
@@ -230,7 +256,7 @@ class Tournament(Table):
         return f"{self.tournament_name} a lieu à {self.location}"
 
 
-class Tour(Table):
+class Round(Table):
     NUMBER_OF_TOUR = 1
 
     def __init__(
@@ -238,21 +264,23 @@ class Tour(Table):
         time_begin=None,
         time_end=None,
         list_of_completed_matchs=None,
+        id=None,
     ):
-        self.table = "tour"
-        self.id = 0
-        self.name: str = f"Tour {str(Tour.NUMBER_OF_TOUR)}"
+        self.table = db.table("round")
+        self.id = id
+        self.name: str = f"Round {str(Round.NUMBER_OF_TOUR)}"
         self.time_begin: str = time_begin
         self.time_end: str = time_end
-        self.list_of_completed_matchs: list = list_of_completed_matchs
-        self.table = db.table(self.table)
+        self.list_of_completed_matchs: tuple = list_of_completed_matchs
 
     # allow editing.
     def set_data(self):
         return {
+            "name": self.name,
             "time_begin": self.time_begin,
             "time_end": self.time_end,
             "list_of_completed_matchs": self.list_of_completed_matchs,
+            "id": 0,
         }
 
     # allow to set data in instance
@@ -261,31 +289,63 @@ class Tour(Table):
         time_end = data["time_end"]
         list_of_completed_matchs = data["list_of_completed_matchs"]
 
-        Tour(time_begin, time_end, list_of_completed_matchs)
+        return Round(time_begin, time_end, list_of_completed_matchs, id)
 
-    def save(self, tour_data):
-        new_tour_id = self.table.insert(
+    def save(self):
+        new_round_id = self.table.insert(
             {
-                "id": 0,
                 "name": self.name,
-                "time_begin": tour_data["time_begin"],
-                "time_end": tour_data["time_end"],
-                "list_of_completed_matchs": tour_data["list_of_completed_matchs"],
+                "time_begin": self.time_begin,
+                "time_end": self.time_end,
+                "list_of_completed_matchs": self.list_of_completed_matchs,
+                "id": 0,
             }
         )
-        self.table.update({"id": new_tour_id}, doc_ids=[new_tour_id])
+        self.table.update({"id": new_round_id}, doc_ids=[new_round_id])
 
-    def get_tour_id(self, tour_data):
+    def get_round_id(self):
         in_db = Query()
         return self.table.get(
-            (in_db.time_begin == tour_data["time_begin"])
-            & (in_db.time_end == tour_data["time_end"])
-            & (in_db.list_of_completed_matchs == tour_data["list_of_completed_matchs"])
+            (in_db.time_begin == self.time_begin)
+            & (in_db.time_end == self.time_end)
+            & (in_db.list_of_completed_matchs == self.list_of_completed_matchs)
         ).doc_id
+        
+
+    def get_round_by_id(self, id_list):
+        result = []
+        for id in id_list:
+            query = db.table("round").search(Query().id == int(id))
+            result.append(
+                {
+                    "name": query[0]["name"],
+                    "time_begin": query[0]["time_begin"],
+                    "time_end": query[0]["time_end"],
+                    "list_of_completed_matchs": query[0]["list_of_completed_matchs"],
+                    "id": query[0]["id"],
+                }
+            )
+
+        return result
+
+    def get_last_round_by_id(self, id_list):
+        result = []
+        query = db.table("round").search(Query().id == int(id_list[-1]))
+        result.append(
+            {
+                "name": query[0]["name"],
+                "time_begin": query[0]["time_begin"],
+                "time_end": query[0]["time_end"],
+                "list_of_completed_matchs": query[0]["list_of_completed_matchs"],
+                "id": query[0]["id"],
+            }
+        )
+
+        return result
 
     def up_turn_number(self):
-        Tour.NUMBER_OF_TOUR += 1
-        return Tour.NUMBER_OF_TOUR
+        Round.NUMBER_OF_TOUR += 1
+        return Round.NUMBER_OF_TOUR
 
     def get_time_now(self):
         datetime_paris = datetime.now(pytz.timezone("Europe/Paris"))
@@ -293,14 +353,38 @@ class Tour(Table):
 
 
 class Match(Table):
-    NUMBER_OF_MATCH = 0
-
     def __init__(self, player_1: Player = None, player_2: Player = None, score_player_1=0.0, score_player_2=0.0):
         self.player_1 = player_1
         self.player_2 = player_2
         self.score_player_1 = score_player_1
         self.score_player_2 = score_player_2
 
-    def up_match_number(self):
-        Match.NUMBER_OF_MATCH += 1
-        return Match.NUMBER_OF_MATCH
+    # allow editing.
+    def set_data(self):
+        return {
+            "player_1": self.player_1,
+            "player_2": self.player_2,
+            "score_player_1": self.score_player_1,
+            "score_player_2": self.score_player_2,
+        }
+
+    # allow to set data in instance
+    def unset_data(self):
+        player_1 = self.player_1
+        player_2 = self.player_2
+        score_player_1 = self.score_player_1
+        score_player_2 = self.score_player_2
+
+        return Match(player_1, player_2, score_player_1, score_player_2)
+
+    def save(self):
+        new_match_id = self.table.insert(
+            {
+                "player_1": self.player_1,
+                "player_2": self.player_2,
+                "score_player_1": self.score_player_1,
+                "score_player_2": self.score_player_2,
+                "id": 0,
+            }
+        )
+        self.table.update({"id": new_match_id}, doc_ids=[new_match_id])
