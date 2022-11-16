@@ -2,6 +2,7 @@
 from .validation import display_error
 from .screen_and_sys_func import clear_screen
 from .play_match_view import Playmatch
+from .display_tournament_reports import TournamentReports
 from .menu import TournamentMenu
 from models.tables import Tournament
 from controllers.tournament_controller import TournamentController
@@ -105,6 +106,7 @@ class DisplayTournaments:
             return self.select_tournament()
 
     def display_tournament_data_continue(self, tournament_model_instance):
+        print(tournament_model_instance.id)
         self.console.print(
             "[bold]\nCe tournoi est terminé.\n[/bold]"
             "[bold]\nVoulez-vous consulter les résultats ?\n[/bold]"
@@ -119,4 +121,4 @@ class DisplayTournaments:
         elif response.lower() == "n":
             TournamentMenu().display_menu_choices()
         else:
-            return self.display_selected_tournaments(tournament_model_instance)
+            return TournamentReports().display_tournament_data(tournament_model_instance.id)

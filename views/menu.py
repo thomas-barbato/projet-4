@@ -39,7 +39,8 @@ class TournamentMenu:
                 "[bold green]2)[/bold green] [bold]Inscrire un nouveau joueur[/bold]\n"
                 "[bold green]3)[/bold green] [bold]Consulter les tournois créés[/bold]\n"
                 "[bold green]4)[/bold green] [bold]Consulter les joueurs inscrits[/bold]\n"
-                "[bold green]5)[/bold green] [bold]Quitter[/bold]",
+                "[bold green]5)[/bold green] [bold]Consulter les rapports de tournois[/bold]\n"
+                "[bold green]6)[/bold green] [bold]Quitter[/bold]\n",
                 border_style="red",
             )
         )
@@ -47,7 +48,7 @@ class TournamentMenu:
     def display_menu_choices(self):
         self.display_main_menu()
         menu_choices = input("Entrez votre choix: ")
-        if menu_choices in ["1", "2", "3", "4", "5"]:
+        if menu_choices in ["1", "2", "3", "4", "5", "6"]:
             return menu_choices
         else:
             self.console.print(display_error("main_choice_value"))

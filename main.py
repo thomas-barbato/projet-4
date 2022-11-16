@@ -1,5 +1,5 @@
 """import"""
-# from views.menu import TournamentMenu
+# from controllers.main_controller import MainController
 from controllers.main_controller import MainController
 
 

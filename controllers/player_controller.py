@@ -1,6 +1,6 @@
 """import"""
 from models.tables import Player, Round
-from tinydb import TinyDB, where
+from tinydb import TinyDB, where, Query
 from operator import attrgetter
 
 
@@ -84,6 +84,27 @@ class PlayerController:
                 )
         return tuple(zip(first_team, second_team))
 
+    def display_all_registred_players(self):
+        return self.db.table("players").all()
+
+    def display_all_player_in_tournament(self, id_list):
+        players = []
+        for id in id_list:
+            players.append(self.db.table("players").get(Query().id == id))
+        return players
+
+    def sort_player_list(self, player_list, sort_arg):
+        if sort_arg == "ranking":
+            return sorted(player_list, key=lambda x: x[sort_arg], reverse=True)
+        else:
+            return sorted(player_list, key=lambda x: x[sort_arg], reverse=False)
+
+    def sort_player_by_ranking(self):
+        return sorted(self.db.table("players").all(), key=lambda d: d["ranking"], reverse=True)
+
+    def sort_player_by_lastname(self):
+        return sorted(self.db.table("players").all(), key=lambda d: d["last_name"], reverse=False)
+
     def sort_players_by_score(self, tournament_object):
         self.tournament_object = tournament_object
         self.round_model = Round()
@@ -162,3 +183,17 @@ class PlayerController:
             for i in range(0, len(players_data))
             if players_data[i]["id"] in id_list
         ]
+
+    def add_temp_score_to_player_list(self, player_list, round_score_list):
+        # store player instance in player_list:
+        player_object_list: list = []
+        for player in player_list:
+            new_score = Player().unset_data(player)
+            for score in round_score_list:
+                if score[0][0] == new_score.id:
+                    new_score.score = score[0][1]
+                elif score[1][0] == new_score.id:
+                    new_score.score = score[1][1]
+
+            player_object_list.append(Player().unset_data(new_score))
+        return player_object_list

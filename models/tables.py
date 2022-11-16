@@ -100,6 +100,20 @@ class Player(Table):
 
         return result
 
+    def get_player_name_by_id(self, id):
+
+        query = db.table("players").search(Query().id == int(id))
+        result = {}
+        result["first_name"] = query[0]["first_name"]
+        result["last_name"] = query[0]["last_name"]
+        result["date_of_birth"] = query[0]["date_of_birth"]
+        result["gender"] = query[0]["gender"]
+        result["ranking"] = query[0]["ranking"]
+        result["score"] = query[0]["score"]
+        result["id"] = query[0]["id"]
+
+        return f'{result["last_name"]} {result["first_name"]}'
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} est classé {self.ranking}\
             avec score de {self.score}"
@@ -261,14 +275,15 @@ class Round(Table):
 
     def __init__(
         self,
+        name=None,
         time_begin=None,
         time_end=None,
         list_of_completed_matchs=None,
         id=None,
     ):
         self.table = db.table("round")
-        self.id = id
-        self.name: str = f"Round {str(Round.NUMBER_OF_TOUR)}"
+        self.id: int = id
+        self.name: str = name
         self.time_begin: str = time_begin
         self.time_end: str = time_end
         self.list_of_completed_matchs: tuple = list_of_completed_matchs
@@ -285,11 +300,12 @@ class Round(Table):
 
     # allow to set data in instance
     def unset_data(self, data):
+        name = data["name"]
         time_begin = data["time_begin"]
         time_end = data["time_end"]
         list_of_completed_matchs = data["list_of_completed_matchs"]
 
-        return Round(time_begin, time_end, list_of_completed_matchs, id)
+        return Round(name, time_begin, time_end, list_of_completed_matchs, id)
 
     def save(self):
         new_round_id = self.table.insert(
@@ -310,7 +326,21 @@ class Round(Table):
             & (in_db.time_end == self.time_end)
             & (in_db.list_of_completed_matchs == self.list_of_completed_matchs)
         ).doc_id
-        
+
+    def get_last_round_by_id(self, id_list):
+        result = []
+        query = db.table("round").search(Query().id == int(id_list[-1]))
+        result.append(
+            {
+                "name": query[0]["name"],
+                "time_begin": query[0]["time_begin"],
+                "time_end": query[0]["time_end"],
+                "list_of_completed_matchs": query[0]["list_of_completed_matchs"],
+                "id": query[0]["id"],
+            }
+        )
+
+        return result
 
     def get_round_by_id(self, id_list):
         result = []
@@ -325,21 +355,6 @@ class Round(Table):
                     "id": query[0]["id"],
                 }
             )
-
-        return result
-
-    def get_last_round_by_id(self, id_list):
-        result = []
-        query = db.table("round").search(Query().id == int(id_list[-1]))
-        result.append(
-            {
-                "name": query[0]["name"],
-                "time_begin": query[0]["time_begin"],
-                "time_end": query[0]["time_end"],
-                "list_of_completed_matchs": query[0]["list_of_completed_matchs"],
-                "id": query[0]["id"],
-            }
-        )
 
         return result
 

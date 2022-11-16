@@ -3,8 +3,8 @@ from views.screen_and_sys_func import clear_screen, exit_to_console
 from views.create_player_view import CreatePlayer
 from views.create_tournament_view import CreateTournament
 from views.display_tournaments import DisplayTournaments
+from views.display_tournament_reports import TournamentReports
 from views.display_players import DisplayPlayers
-from rich import print
 from rich.console import Console
 
 
@@ -15,6 +15,7 @@ class MainController:
         self.create_tournament_view = CreateTournament()
         self.display_tournaments = DisplayTournaments()
         self.display_players = DisplayPlayers()
+        self.display_reports = TournamentReports()
         self.console = Console()
 
     def select_menu_choice(self):
@@ -28,6 +29,11 @@ class MainController:
         elif selected == "4":
             return self.display_players.display_all_players()
         elif selected == "5":
+            return self.display_reports.display_reports()
+        elif selected == "6":
             clear_screen(0)
             self.console.print("[italic red]Le programme va maintenant se terminer, à bientot.[/italic red]")
             exit_to_console(0)
+        else:
+            clear_screen(0)
+            return self.select_menu_choice()

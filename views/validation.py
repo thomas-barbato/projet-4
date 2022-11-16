@@ -47,6 +47,12 @@ def display_error(category: str):
         "[italic red] veuillez entrer l'un des choix suivants: [/italic red]"
         "[bold red]homme[/bold red][italic red] ou [/italic red][bold red]femme[/bold red]",
         "tournament_id_unknown": "[italic red]Veuillez entrer une ID valide[/italic red]",
+        "wrong_input_player_display_choice": "[italic red]Veuillez entrer une valeur correcte,[/italic red]"
+        "[italic red] format attendu:\n[/italic red]"
+        "[bold red]1[/bold red], [bold red]2[/bold red], [bold red]3[/bold red] ou [bold red]4[/bold red].",
+        "wrong_input_report_display_choice": "[italic red]Veuillez entrer une valeur correcte,[/italic red]"
+        "[italic red] format attendu:\n[/italic red]"
+        "[bold red]1[/bold red], [bold red]2[/bold red] ou [bold red]3[/bold red].",
     }[category]
 
 

@@ -19,6 +19,7 @@ class Playmatch:
         self.round_model: Round = Round()
         self.time_begin: str = ""
         self.time_end: str = ""
+        self.name: str = f"Round {self.round_model.NUMBER_OF_TOUR}"
         self.list_of_completed_match: list = []
         self.matchs_list_per_tour: list = []
         self.current_rounds: list = []
@@ -90,9 +91,6 @@ class Playmatch:
             self.console.print("\n\n[bold]Vous allez être redirigé vers la page d'accueil.[/bold]\n")
             return TournamentMenu().display_menu_choices()
 
-    def display_tournament_result(self):
-        pass
-
     def start_chronometer(self):
         response: str = input("Lancer le chronomètre ? (o/n): ")
         if not response.lower() in ["o", "n"]:
@@ -113,10 +111,19 @@ class Playmatch:
         elif response.lower() == "n":
             self.end_chronometer()
 
+    def select_result(self):
+        response: str = input("Résultat: ")
+        if response not in ["1", "2", "3"]:
+            self.console.print(display_error("wrong_match_result_input"))
+            return self.select_result()
+        else:
+            return response
+
     def save_tournament_current_tour_and_exit(self):
-        
-        self.current_rounds.append(Round(self.time_begin, self.time_end, self.list_of_completed_match))
+        round_name = f"Round {self.round_model.NUMBER_OF_TOUR}"
+        self.current_rounds.append(Round(round_name, self.time_begin, self.time_end, self.list_of_completed_match))
         self.tournament_controller.save_current_round(self.tournament_object, self.current_rounds)
+        self.current_rounds.clear()
         response: str = input("Voulez-vous sauvegarder et quitter la manche en cours ? (o/n): ")
         if not response.lower() in ["o", "n"]:
             self.console.print(display_error("wrong_input_choice_to_continue"))
@@ -126,13 +133,8 @@ class Playmatch:
             self.console.print("\n[bold]vous allez être redirigé vers le menu principal.[/bold]")
             return TournamentMenu().display_menu_choices()
 
-    def select_result(self):
-        response: str = input("Résultat: ")
-        if response not in ["1", "2", "3"]:
-            self.console.print(display_error("wrong_match_result_input"))
-            return self.select_result()
-        else:
-            return response
+    def display_tournament_result(self):
+        pass
 
     def display_tournament_begin(self):
         clear_screen(0)
@@ -142,7 +144,7 @@ class Playmatch:
         )
         round_count = len(self.tournament_object.rounds) if len(self.tournament_object.rounds) > 0 else 1
 
-        for i in range(len(self.tournament_object.rounds), self.tournament_object.number_of_round):
+        for i in range(len(self.tournament_object.rounds), int(self.tournament_object.number_of_round)):
             # clean pairing
             self.pairing = ()
             self.set_pairing()

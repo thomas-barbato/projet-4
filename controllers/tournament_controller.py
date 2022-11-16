@@ -53,9 +53,12 @@ class TournamentController:
             player_1 = round[0][0]
             player_2 = round[1][0]
             round_list.append([[player_1.id, round[0][1]], [player_2.id, round[1][1]]])
-
-        Round(round_object_list[0].time_begin, round_object_list[0].time_end, round_list).save()
-        round_id = Round(round_object_list[0].time_begin, round_object_list[0].time_end, round_list).get_round_id()
+        Round(
+            round_object_list[0].name, round_object_list[0].time_begin, round_object_list[0].time_end, round_list
+        ).save()
+        round_id = Round(
+            round_object_list[0].name, round_object_list[0].time_begin, round_object_list[0].time_end, round_list
+        ).get_round_id()
         tournament_data["rounds"].append(round_id)
         update_tournament = Tournament().unset_data(tournament_data)
         update_tournament.update(tournament_data)
