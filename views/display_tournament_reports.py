@@ -75,13 +75,13 @@ class TournamentReports:
         player_table.add_column("identitée", justify="center", style="white", no_wrap=True)
         player_table.add_column("date naissance", justify="center", style="white", no_wrap=True)
         player_table.add_column("genre", justify="center", style="white", no_wrap=True)
-        player_table.add_column("rank", justify="center", style="white", no_wrap=True)
+        player_table.add_column("rang", justify="center", style="green", no_wrap=True)
         player_table.add_row(
             f"{player['id']}",
             f"{player['last_name']} {player['first_name']}",
             f"{player['date_of_birth']}",
             f"{player['gender']}",
-            f"{player['ranking']}",
+            f"[bold]{player['ranking']}[/bold]",
         )
         self.console.print(player_table)
         name = f"{player['first_name']} {player['last_name']}"
@@ -145,7 +145,7 @@ class TournamentReports:
             "[bold][italic yellow]AFFICHE DES RESULTATS DE [/italic yellow][/bold]"
             f"[bold][italic yellow]'{self.tournament_data.tournament_name.upper()}'[/italic yellow][/bold]\n",
             style=None,
-            justify="right",
+            justify="center",
         )
         round_data = Round().get_round_by_id(self.tournament_data.rounds)
         for round in round_data:
@@ -240,7 +240,7 @@ class TournamentReports:
         player_table.add_column("identitée", justify="center", style="white", no_wrap=True)
         player_table.add_column("date naissance", justify="center", style="white", no_wrap=True)
         player_table.add_column("genre", justify="center", style="white", no_wrap=True)
-        player_table.add_column("rank", justify="center", style="white", no_wrap=True)
+        player_table.add_column("rang", justify="center", style="white", no_wrap=True)
         player_table.add_column("score compétition", justify="center", style="cyan", no_wrap=True)
         for player in player_list:
             player_table.add_row(
@@ -249,7 +249,7 @@ class TournamentReports:
                 f"{player.date_of_birth}",
                 f"{player.gender}",
                 f"{player.ranking}",
-                f"{player.score}",
+                f"[bold]{player.score}[/bold]",
             )
         self.console.print(player_table)
         self.console.print(
@@ -258,7 +258,7 @@ class TournamentReports:
                 "[bold green]1)[/bold green] [bold]Selectionner un joueur[/bold]\n"
                 "[bold green]2)[/bold green] [bold]Afficher par ordre alphabetique[/bold]\n"
                 "[bold green]3)[/bold green] [bold]Afficher par rang[/bold]\n"
-                "[bold green]4)[/bold green] [bold]Retour aux rapports[/bold]\n",
+                "[bold green]4)[/bold green] [bold]Retour aux rapports[/bold]",
                 border_style="red",
             )
         )

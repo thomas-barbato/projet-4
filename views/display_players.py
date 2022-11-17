@@ -90,13 +90,13 @@ class DisplayPlayers:
         player_table.add_column("identitée", justify="center", style="white", no_wrap=True)
         player_table.add_column("date naissance", justify="center", style="white", no_wrap=True)
         player_table.add_column("genre", justify="center", style="white", no_wrap=True)
-        player_table.add_column("rank", justify="center", style="white", no_wrap=True)
+        player_table.add_column("rang", justify="center", style="green", no_wrap=True)
         player_table.add_row(
             f"{player['id']}",
             f"{player['last_name']} {player['first_name']}",
             f"{player['date_of_birth']}",
             f"{player['gender']}",
-            f"{player['ranking']}",
+            f"[bold]{player['ranking']}[/bold]",
         )
         self.console.print(player_table)
         name = f"{player['first_name']} {player['last_name']}"
