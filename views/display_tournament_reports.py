@@ -15,6 +15,7 @@ class TournamentReports:
         self.console = Console()
         self.tournament_list = TournamentController().get_all_tournaments()
         self.tournament_data = []
+        self.player_controller = PlayerController()
 
     def display_reports(self):
         clear_screen(0)
@@ -226,14 +227,14 @@ class TournamentReports:
             style=None,
             justify="center",
         )
-        player_list = PlayerController().display_all_player_in_tournament(self.tournament_data.players_choice)
+        player_list = self.player_controller.display_all_player_in_tournament(self.tournament_data.players_choice)
         get_last_round_results = Round().get_round_by_id(self.tournament_data.rounds)[-1]["list_of_completed_matchs"]
-        player_list = PlayerController().add_temp_score_to_player_list(player_list, get_last_round_results)
+        player_list = self.player_controller.add_temp_score_to_player_list(player_list, get_last_round_results)
         if sort_option in ["ranking", "last_name"]:
             if sort_option == "ranking":
-                player_list = PlayerController().sort_player_list(player_list, "ranking")
+                player_list = self.player_controller.sort_player_list(player_list, "ranking")
             else:
-                player_list = PlayerController().sort_player_list(player_list, "last_name")
+                player_list = self.player_controller.sort_player_list(player_list, "last_name")
 
         player_table = Table(title="")
         player_table.add_column("id", justify="center", style="white", no_wrap=True)
