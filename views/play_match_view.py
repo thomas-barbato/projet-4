@@ -144,7 +144,7 @@ class Playmatch:
         )
         round_count = len(self.tournament_object.rounds) if len(self.tournament_object.rounds) > 0 else 1
 
-        for i in range(len(self.tournament_object.rounds), int(self.tournament_object.number_of_round)):
+        for _ in range(len(self.tournament_object.rounds), int(self.tournament_object.number_of_round)):
             # clean pairing
             self.pairing = ()
             self.set_pairing()

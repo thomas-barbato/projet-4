@@ -135,8 +135,6 @@ class TournamentReports:
             return self.display_player_id_select()
         elif action_choice == "2":
             return self.display_player_in_tournament()
-        elif action_choice == "3":
-            return TournamentMenu().display_menu_choices()
         else:
             self.console.print(display_error("wrong_input_report_display_choice"))
             return self.report_action_choice()
@@ -153,8 +151,8 @@ class TournamentReports:
         for round in round_data:
             round_table = Table(
                 title=f"\n[bold cyan]{round['name']}\nDebut le[/bold cyan] "
-                "{round['time_begin']} | "
-                "[bold cyan]Fin le[/bold cyan] {round['time_end']}"
+                f"{round['time_begin']} | "
+                f"[bold cyan]Fin le[/bold cyan] {round['time_end']}"
             )
             round_table.add_column("ID 1", justify="center", style="yellow", no_wrap=True)
             round_table.add_column("Compétiteur 1", justify="center", style="white", no_wrap=True)
