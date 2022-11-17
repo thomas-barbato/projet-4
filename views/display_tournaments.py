@@ -119,6 +119,6 @@ class DisplayTournaments:
             self.console.print(display_error("wrong_input_choice_to_continue"))
             return self.display_tournament_data_continue()
         elif response.lower() == "n":
-            TournamentMenu().display_menu_choices()
+            return
         else:
             return TournamentReports().display_tournament_data(tournament_model_instance.id)

@@ -53,4 +53,4 @@ class TournamentMenu:
         else:
             self.console.print(display_error("main_choice_value"))
             clear_screen(1)
-            self.display_menu_choices()
+            return self.display_menu_choices()

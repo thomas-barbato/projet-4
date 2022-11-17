@@ -6,6 +6,7 @@ from views.display_tournaments import DisplayTournaments
 from views.display_tournament_reports import TournamentReports
 from views.display_players import DisplayPlayers
 from rich.console import Console
+import time
 
 
 class MainController:
@@ -21,19 +22,17 @@ class MainController:
     def select_menu_choice(self):
         selected = self.display_menu.display_menu_choices()
         if selected == "1":
-            return self.create_tournament_view.display_tournament_continue()
+            self.create_tournament_view.display_tournament_continue()
         elif selected == "2":
-            return self.create_player_view.display_player_continue()
+            self.create_player_view.display_player_continue()
         elif selected == "3":
-            return self.display_tournaments.display_all_tournaments()
+            self.display_tournaments.display_all_tournaments()
         elif selected == "4":
-            return self.display_players.display_all_players()
+            self.display_players.display_all_players()
         elif selected == "5":
-            return self.display_reports.display_reports()
-        elif selected == "6":
-            clear_screen(0)
+            self.display_reports.display_reports()
+        if selected == "6":
             self.console.print("[italic red]Le programme va maintenant se terminer, à bientot.[/italic red]")
             exit_to_console(0)
         else:
-            clear_screen(0)
-            return self.select_menu_choice()
+            self.select_menu_choice()

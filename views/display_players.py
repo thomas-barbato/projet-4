@@ -30,7 +30,7 @@ class DisplayPlayers:
 
         player_table = Table(title="")
         player_table.add_column("id", justify="center", style="white", no_wrap=True)
-        player_table.add_column("identitée", justify="center", style="white", no_wrap=True)
+        player_table.add_column("identité", justify="center", style="white", no_wrap=True)
         player_table.add_column("date naissance", justify="center", style="white", no_wrap=True)
         player_table.add_column("genre", justify="center", style="white", no_wrap=True)
         player_table.add_column("rank", justify="center", style="white", no_wrap=True)
@@ -66,7 +66,9 @@ class DisplayPlayers:
             self.display_all_players("ranking")
             self.display_player_menu_choice()
         elif player_select_choice == "4":
-            return TournamentMenu().display_menu_choices()
+            return
+            #from controllers.main_controller import MainController
+            #return MainController().select_menu_choice()
         else:
             self.console.print(display_error("wrong_input_player_display_choice"))
             self.display_player_menu_choice()

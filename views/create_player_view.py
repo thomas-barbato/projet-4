@@ -60,7 +60,7 @@ class CreatePlayer:
         elif response.lower() == "o":
             return self.display_player_create_menu()
         elif response.lower() == "n":
-            TournamentMenu().display_menu_choices()
+            return
 
     def display_player_last_name(self):
         try:
@@ -179,7 +179,7 @@ class CreatePlayer:
                     "\n[bold]Création annulée,[/bold]" "[bold]vous allez être redirigé vers le menu principal.[/bold]"
                 )
                 clear_screen(1)
-                TournamentMenu().display_menu_choices()
+                return
 
     def display_confirm_create_another_player(self):
         response = input("Inscrire un nouveau joueur ? (o/n): ")
@@ -195,4 +195,4 @@ class CreatePlayer:
                     "\n[bold]Création annulée,[/bold]" "[bold]vous allez être redirigé vers le menu principal.[/bold]"
                 )
                 clear_screen(1)
-                TournamentMenu().display_menu_choices()
+                return

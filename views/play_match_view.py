@@ -3,6 +3,8 @@ from .validation import display_error
 from .screen_and_sys_func import clear_screen
 from controllers.tournament_controller import TournamentController
 from controllers.player_controller import PlayerController
+#from views.display_tournaments import DisplayTournaments
+from views.display_tournament_reports import TournamentReports
 from .menu import TournamentMenu
 from models.tables import Tournament, Match, Round
 from rich.console import Console
@@ -84,12 +86,12 @@ class Playmatch:
             self.console.print(display_error("wrong_input_choice_to_continue"))
             self.display_end_tournament()
         elif response.lower() == "o":
-            pass
-            # DisplayTournaments().display_selected_tournaments(self.tournament_object)
+            print(self.tournament_object.id)
+            TournamentReports().display_tournament_data(self.tournament_object.id)
         elif response.lower() == "n":
             clear_screen(0)
             self.console.print("\n\n[bold]Vous allez être redirigé vers la page d'accueil.[/bold]\n")
-            return TournamentMenu().display_menu_choices()
+            return
 
     def start_chronometer(self):
         response: str = input("Lancer le chronomètre ? (o/n): ")
@@ -131,7 +133,7 @@ class Playmatch:
             clear_screen(1)
             self.console.print("[bold]Sauvegarde terminée...[/bold]")
             self.console.print("\n[bold]vous allez être redirigé vers le menu principal.[/bold]")
-            return TournamentMenu().display_menu_choices()
+            return
 
     def display_tournament_result(self):
         pass
