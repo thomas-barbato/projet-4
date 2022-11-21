@@ -3,9 +3,9 @@ from .validation import display_error
 from .screen_and_sys_func import clear_screen
 from controllers.tournament_controller import TournamentController
 from controllers.player_controller import PlayerController
-#from views.display_tournaments import DisplayTournaments
+
+# from views.display_tournaments import DisplayTournaments
 from views.display_tournament_reports import TournamentReports
-from .menu import TournamentMenu
 from models.tables import Tournament, Match, Round
 from rich.console import Console
 from rich.table import Table

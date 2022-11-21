@@ -3,10 +3,8 @@ from .validation import display_error
 from .screen_and_sys_func import clear_screen
 from .play_match_view import Playmatch
 from .display_tournament_reports import TournamentReports
-from .menu import TournamentMenu
 from models.tables import Tournament
 from controllers.tournament_controller import TournamentController
-from rich import print
 from rich.console import Console
 from rich.table import Table
 
@@ -15,10 +13,11 @@ class DisplayTournaments:
     def __init__(self):
         self.selected_tournament_id = None
         self.console = Console()
+        self.tournament_controller = TournamentController()
 
     def display_all_tournaments(self):
         clear_screen(0)
-        tournament_list = TournamentController().get_all_tournaments()
+        tournament_list = self.tournament_controller.get_all_tournaments()
         self.console.print(
             "[bold][italic yellow]VOS TOURNOIS[/italic yellow][/bold]\n",
             style=None,
@@ -47,7 +46,7 @@ class DisplayTournaments:
                 tournament["time_controller_choice"],
                 tournament["description"],
             )
-        print(tournament_table)
+        self.console.print(tournament_table)
         self.select_tournament()
 
     def display_selected_tournaments(self, selected_tournament_instance):
@@ -82,7 +81,7 @@ class DisplayTournaments:
             selected_tournament["time_controller_choice"],
             selected_tournament["description"],
         )
-        print(tournament_table)
+        self.console.print(tournament_table)
 
     def select_tournament(self):
         try:
@@ -91,8 +90,8 @@ class DisplayTournaments:
                 self.console.print(display_error("empty_field"))
                 return self.select_tournament()
             else:
-                if TournamentController().check_if_tournament_id_exists(int(self.tournament_id)) is True:
-                    tournament_data = TournamentController().get_tournament_by_id(int(self.tournament_id))
+                if self.tournament_controller.check_if_tournament_id_exists(int(self.tournament_id)) is True:
+                    tournament_data = self.tournament_controller.get_tournament_by_id(int(self.tournament_id))
                     tournament_model_instance = Tournament(tournament_data).unset_data(tournament_data)
                     if len(tournament_data["rounds"]) == int(tournament_data["number_of_round"]):
                         self.display_tournament_data_continue(tournament_model_instance)
@@ -106,7 +105,6 @@ class DisplayTournaments:
             return self.select_tournament()
 
     def display_tournament_data_continue(self, tournament_model_instance):
-        print(tournament_model_instance.id)
         self.console.print(
             "[bold]\nCe tournoi est terminé.\n[/bold]"
             "[bold]\nVoulez-vous consulter les résultats ?\n[/bold]"

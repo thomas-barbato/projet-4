@@ -1,7 +1,6 @@
 """import"""
 from .validation import display_error, check_date_format
 from .screen_and_sys_func import clear_screen
-from views.menu import TournamentMenu
 from views.create_player_view import CreatePlayer
 from views.play_match_view import Playmatch
 from controllers.tournament_controller import TournamentController
@@ -26,8 +25,10 @@ class CreateTournament:
         self.time_controller_choice: str = ""
         self.description: str = ""
         self.rounds: list = []
-        self.id = 1
+        self.id: int = 1
         self.pairing_round: tuple = ()
+        self.create_player = CreatePlayer()
+        self.tournament_controller = TournamentController()
 
     def tournament_data(self):
         return {
@@ -144,14 +145,13 @@ class CreateTournament:
 
     def display_player_list(self):
         # add here display limitation
-        players = TournamentController()
-        if len(players.get_players_list()) >= 8:
+        if len(self.tournament_controller.get_players_list()) >= 8:
             table = Table(title="\n\n[bold]Liste des joueurs à inscrire à ce tournoi[/bold]\n")
             table.add_column("Id", justify="center", style="cyan", no_wrap=True)
             table.add_column("Nom", justify="center", style="white", no_wrap=True)
             table.add_column("Prenom", justify="center", style="white", no_wrap=True)
 
-            for player in players.get_players_list():
+            for player in self.tournament_controller.get_players_list():
                 table.add_row(
                     str(player["id"]),
                     str(player["first_name"]),
@@ -159,12 +159,15 @@ class CreateTournament:
                 )
             self.console.print(table)
 
-        elif len(players.get_players_list()) > 0 and len(players.get_players_list()) <= 8:
+        elif (
+            len(self.tournament_controller.get_players_list()) > 0
+            and len(self.tournament_controller.get_players_list()) <= 8
+        ):
             self.console.print(display_error("too_few_player_created"))
-            return CreatePlayer().display_player_continue()
+            return self.create_player.display_player_continue()
         else:
             self.console.print(display_error("no_player_created"))
-            return CreatePlayer().display_player_continue()
+            return self.create_player.display_player_continue()
 
     def display_player_choice(self):
         self.console.print(
@@ -237,13 +240,11 @@ class CreateTournament:
             )
         )
         if len(self.players_choice) == 8:
-            players = TournamentController()
             selected_players_table = Table(title="\n[bold]Liste des joueurs à inscrire à ce tournoi[/bold]\n")
             selected_players_table.add_column("id", justify="center", style="cyan", no_wrap=True)
             selected_players_table.add_column("Nom de famille", justify="center", style="white", no_wrap=True)
             selected_players_table.add_column("Prenom", justify="center", style="white", no_wrap=True)
-            player_list = players.get_players_list()
-            for player in player_list:
+            for player in self.tournament_controller.get_players_list():
                 if player["id"] in self.players_choice:
                     selected_players_table.add_row(
                         str(player["id"]),
@@ -293,7 +294,7 @@ class CreateTournament:
         else:
             if response.lower() == "o":
                 clear_screen(1)
-                tournament_data = TournamentController().get_tournament_by_name(self.tournament_name)
+                tournament_data = self.tournament_controller.get_tournament_by_name(self.tournament_name)
                 tournament_model_instance = Tournament(tournament_data).unset_data(tournament_data)
                 return Playmatch(tournament_model_instance).display_tournament_begin()
             elif response.lower() == "n":

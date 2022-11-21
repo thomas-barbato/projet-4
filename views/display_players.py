@@ -1,7 +1,6 @@
 """import"""
 from .validation import display_error
 from .screen_and_sys_func import clear_screen
-from views.menu import TournamentMenu
 from controllers.player_controller import PlayerController
 from models.tables import Player
 from rich.console import Console
@@ -12,6 +11,8 @@ from rich.table import Table
 class DisplayPlayers:
     def __init__(self):
         self.console = Console()
+        self.player_model = Player()
+        self.player_controller = PlayerController()
 
     def display_all_players(self, sort_option=""):
         clear_screen(0)
@@ -21,12 +22,12 @@ class DisplayPlayers:
             justify="center",
         )
         if not sort_option:
-            player_list = PlayerController().display_all_registred_players()
+            player_list = self.player_controller.display_all_registred_players()
         elif sort_option in ["ranking", "last_name"]:
             if sort_option == "ranking":
-                player_list = PlayerController().sort_player_by_ranking()
+                player_list = self.player_controller.sort_player_by_ranking()
             else:
-                player_list = PlayerController().sort_player_by_lastname()
+                player_list = self.player_controller.sort_player_by_lastname()
 
         player_table = Table(title="")
         player_table.add_column("id", justify="center", style="white", no_wrap=True)
@@ -49,7 +50,7 @@ class DisplayPlayers:
                 "[bold green]1)[/bold green] [bold]Selectionner un joueur[/bold]\n"
                 "[bold green]2)[/bold green] [bold]Afficher par ordre alphabetique[/bold]\n"
                 "[bold green]3)[/bold green] [bold]Afficher par rang[/bold]\n"
-                "[bold green]4)[/bold green] [bold]Quitter[/bold]\n",
+                "[bold green]4)[/bold green] [bold]Retour au menu principal[/bold]\n",
                 border_style="red",
             )
         )
@@ -67,8 +68,6 @@ class DisplayPlayers:
             self.display_player_menu_choice()
         elif player_select_choice == "4":
             return
-            #from controllers.main_controller import MainController
-            #return MainController().select_menu_choice()
         else:
             self.console.print(display_error("wrong_input_player_display_choice"))
             self.display_player_menu_choice()
@@ -86,7 +85,7 @@ class DisplayPlayers:
             return self.display_player_id_select()
 
     def display_player_data(self, id):
-        player = Player().get_player_by_id(id)
+        player = self.player_model.get_player_by_id(id)
         player_table = Table(title="")
         player_table.add_column("id", justify="center", style="white", no_wrap=True)
         player_table.add_column("identitée", justify="center", style="white", no_wrap=True)
@@ -115,7 +114,7 @@ class DisplayPlayers:
                 new_rank = input("Choisir un nouveau rang: ")
                 if new_rank.isdigit() and int(new_rank) > 0:
                     # get player data and create new Player instance
-                    edit_player = Player().unset_data(Player().get_player_by_id(id))
+                    edit_player = self.player_model.unset_data(self.player_model.get_player_by_id(id))
                     # change data in .ranking attribute
                     edit_player.ranking = new_rank
                     # update on table

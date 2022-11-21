@@ -53,6 +53,9 @@ def display_error(category: str):
         "wrong_input_report_display_choice": "[italic red]Veuillez entrer une valeur correcte,[/italic red]"
         "[italic red] format attendu:\n[/italic red]"
         "[bold red]1[/bold red], [bold red]2[/bold red] ou [bold red]3[/bold red].",
+        "wrong_input_player_report_display_choice": "[italic red]Veuillez entrer une valeur correcte,[/italic red]"
+        "[italic red] format attendu:\n[/italic red]"
+        "[bold red]1[/bold red], [bold red]2[/bold red], [bold red]3[/bold red] ou [bold red]4[/bold red].",
     }[category]
 
 

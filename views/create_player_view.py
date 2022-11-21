@@ -1,7 +1,6 @@
 """import"""
 from .validation import display_error, check_birth_date_format
 from .screen_and_sys_func import clear_screen
-from views.menu import TournamentMenu
 from controllers.player_controller import PlayerController
 from rich import print
 from rich.console import Console
@@ -17,7 +16,7 @@ class CreatePlayer:
         self.gender: str = None
         self.ranking: int = None
         self.score: float = 0.0
-        self.id = 1
+        self.id: int = 1
 
     def __call__(self):
         self.display_player_create_menu()

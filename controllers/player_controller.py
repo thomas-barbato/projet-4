@@ -108,7 +108,6 @@ class PlayerController:
     def sort_players_by_score(self, tournament_object):
         self.tournament_object = tournament_object
         self.round_model = Round()
-        self.player_model = Player()
         self.player_objects_list = []
         self.matchs_played = []
         first_team: dict = []
@@ -151,7 +150,6 @@ class PlayerController:
         # then by ranking
         # reversed
         self.player_objects_list.sort(key=attrgetter("score", "ranking"), reverse=True)
-        self.round_instance = Round()
         # if player 1 and player 2 already played together:
         # then change player 2 to player 3.
         if [self.player_objects_list[0].id, self.player_objects_list[1].id] in self.matchs_played:
@@ -188,12 +186,12 @@ class PlayerController:
         # store player instance in player_list:
         player_object_list: list = []
         for player in player_list:
-            new_score = Player().unset_data(player)
+            new_score = self.player_model.unset_data(player)
             for score in round_score_list:
                 if score[0][0] == new_score.id:
                     new_score.score = score[0][1]
                 elif score[1][0] == new_score.id:
                     new_score.score = score[1][1]
 
-            player_object_list.append(Player().unset_data(new_score))
+            player_object_list.append(self.player_model.unset_data(new_score))
         return player_object_list

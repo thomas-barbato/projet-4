@@ -1,7 +1,6 @@
 """import"""
 from .validation import display_error
 from .screen_and_sys_func import clear_screen
-from views.menu import TournamentMenu
 from controllers.tournament_controller import PlayerController
 from controllers.tournament_controller import TournamentController
 from models.tables import Player, Tournament, Round
@@ -16,6 +15,9 @@ class TournamentReports:
         self.tournament_list = TournamentController().get_all_tournaments()
         self.tournament_data = []
         self.player_controller = PlayerController()
+        self.tournament_controller = TournamentController()
+        self.tournament_model = Tournament()
+        self.player_model = Player()
 
     def display_reports(self):
         clear_screen(0)
@@ -70,7 +72,7 @@ class TournamentReports:
             return self.display_player_id_select()
 
     def display_player_data(self, id):
-        player = Player().get_player_by_id(id)
+        player = self.player_model.get_player_by_id(id)
         player_table = Table(title="[bold]Liste des participants[/bold]")
         player_table.add_column("id", justify="center", style="white", no_wrap=True)
         player_table.add_column("identitée", justify="center", style="white", no_wrap=True)
@@ -99,7 +101,7 @@ class TournamentReports:
                 new_rank = input("Choisir un nouveau rang: ")
                 if new_rank.isdigit() and int(new_rank) > 0:
                     # get player data and create new Player instance
-                    edit_player = Player().unset_data(Player().get_player_by_id(id))
+                    edit_player = self.player_model.unset_data(self.player_model.get_player_by_id(id))
                     # change data in .ranking attribute
                     edit_player.ranking = new_rank
                     # update on table
@@ -135,7 +137,7 @@ class TournamentReports:
         if action_choice == "1":
             return self.display_player_id_select()
         elif action_choice == "2":
-            return self.display_player_in_tournament()
+            return self.display_reports()
         else:
             self.console.print(display_error("wrong_input_report_display_choice"))
             return self.report_action_choice()
@@ -164,10 +166,10 @@ class TournamentReports:
             for match in round["list_of_completed_matchs"]:
                 round_table.add_row(
                     f"{match[0][0]}",
-                    f"{Player().get_player_name_by_id(match[0][0])}",
+                    f"{self.player_model.get_player_name_by_id(match[0][0])}",
                     f"[bold]{match[0][1]}[/bold]",
                     f"{match[1][0]}",
-                    f"{Player().get_player_name_by_id(match[1][0])}",
+                    f"{self.player_model.get_player_name_by_id(match[1][0])}",
                     f"[bold]{match[1][1]}[/bold]",
                 )
             self.console.print(round_table)
@@ -188,7 +190,7 @@ class TournamentReports:
             style=None,
             justify="center",
         )
-        self.tournament_data = Tournament().unset_data(TournamentController().get_tournament_by_id(id))
+        self.tournament_data = self.tournament_model.unset_data(self.tournament_controller.get_tournament_by_id(id))
         tournament_table = Table(title="")
         tournament_table.add_column("id", justify="center", style="green", no_wrap=True)
         tournament_table.add_column("nom", justify="center", style="white", no_wrap=True)
@@ -212,7 +214,7 @@ class TournamentReports:
                 "[bold green]Menu:[/bold green]\n\n"
                 "[bold green]1)[/bold green] [bold]Afficher compétiteurs[/bold]\n"
                 "[bold green]2)[/bold green] [bold]Afficher les rounds et matchs[/bold]\n"
-                "[bold green]3)[/bold green] [bold]Quitter[/bold]\n",
+                "[bold green]3)[/bold green] [bold]Retour au menu principal[/bold]\n",
                 border_style="red",
             )
         )
@@ -245,7 +247,7 @@ class TournamentReports:
         player_table.add_column("score compétition", justify="center", style="cyan", no_wrap=True)
         for player in player_list:
             player_table.add_row(
-                f"{player.id}",
+                f"[bold]{player.id}[/bold]",
                 f"{player.last_name} {player.first_name}",
                 f"{player.date_of_birth}",
                 f"{player.gender}",
@@ -276,3 +278,6 @@ class TournamentReports:
             self.display_player_menu_choice()
         elif player_select_choice == "4":
             return self.display_reports()
+        else:
+            self.console.print(display_error("wrong_input_player_report_display_choice"))
+            self.display_player_menu_choice()
