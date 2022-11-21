@@ -70,7 +70,7 @@ class CreateTournament:
         self.display_confirm_tournament_save()
 
     def display_tournament_continue(self):
-        clear_screen(1)
+        clear_screen(0)
         self.console.print(
             "[bold]\nBienvenue dans le menu de création d'un nouveau tournoi.[/bold]"
             "[bold]\nVeuillez remplire correctement les informations suivantes:\n[/bold]"
