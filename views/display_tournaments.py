@@ -23,6 +23,7 @@ class DisplayTournaments:
             style=None,
             justify="center",
         )
+        # TODO: Could this part be isolated in a function somewhere tosmooth the readibility here?
         tournament_table = Table()
         tournament_table.add_column("id", justify="center", style="green", no_wrap=True)
         tournament_table.add_column("name", justify="center", style="white", no_wrap=True)
@@ -33,6 +34,7 @@ class DisplayTournaments:
         tournament_table.add_column("liste des joueurs", justify="center", style="white", no_wrap=False)
         tournament_table.add_column("control du temps", justify="center", style="white", no_wrap=True)
         tournament_table.add_column("description", justify="center", style="white", no_wrap=True)
+        # TODO: Empty line to make it more readable
         for tournament in tournament_list:
             player_list = TournamentController(tournament).get_players_name_by_tournament_id(tournament["id"])
             tournament_table.add_row(

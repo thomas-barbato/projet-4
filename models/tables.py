@@ -1,4 +1,6 @@
+# TODO: Docstring should contain a description of the file contains
 """import"""
+# TODO: Sort imports using isort
 from tinydb import TinyDB, Query
 from datetime import datetime
 import pytz
@@ -37,6 +39,7 @@ class Player(Table):
 
     # allow editing.
     def set_data(self):
+        # TODO: Is it possible to use self.__dict__ here? is that working the same?
         return {
             "first_name": self.first_name,
             "last_name": self.last_name,
@@ -49,6 +52,8 @@ class Player(Table):
 
     # allow to set data in instance
     def unset_data(self, data):
+        # TODO: If you were using named parameters instead of positional parameters when instanciating
+        # You could do something like Player(**data) for the same effect
         first_name: str = data["first_name"]
         last_name: str = data["last_name"]
         date_of_birth: str = data["date_of_birth"]
@@ -60,6 +65,7 @@ class Player(Table):
         return Player(first_name, last_name, date_of_birth, gender, ranking, score, id)
 
     def update(self, player_data):
+        # TODO: self.table.update(player_data) directly?
         self.table.update(
             {
                 "first_name": player_data["first_name"],
@@ -89,6 +95,7 @@ class Player(Table):
 
     def get_player_by_id(self, id):
         query = db.table("players").search(Query().id == int(id))
+        # TODO: add "user = user_query[0] and reuse user when query[0] is used
         result = {}
         result["first_name"] = query[0]["first_name"]
         result["last_name"] = query[0]["last_name"]

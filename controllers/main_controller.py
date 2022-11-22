@@ -1,3 +1,5 @@
+# TODO: Docstring should contain a description of the file contains
+# TODO: Sort imports using isort
 from views.menu import TournamentMenu
 from views.screen_and_sys_func import exit_to_console
 from views.create_player_view import CreatePlayer
@@ -5,6 +7,7 @@ from views.create_tournament_view import CreateTournament
 from views.display_tournaments import DisplayTournaments
 from views.display_tournament_reports import TournamentReports
 from views.display_players import DisplayPlayers
+
 from rich.console import Console
 
 

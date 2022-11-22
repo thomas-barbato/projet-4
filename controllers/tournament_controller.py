@@ -1,4 +1,6 @@
+# TODO: Docstring should contain a description of the file contains
 """import"""
+# TODO: Sort imports using isort
 from tinydb import TinyDB, Query
 from models.tables import Tournament, Player, Round
 from controllers.player_controller import PlayerController

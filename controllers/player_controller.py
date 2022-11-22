@@ -1,4 +1,6 @@
+# TODO: Docstring should contain a description of the file contains
 """import"""
+# TODO: Sort imports using isort
 from models.tables import Player, Round
 from tinydb import TinyDB, where, Query
 from operator import attrgetter
@@ -94,6 +96,7 @@ class PlayerController:
         return players
 
     def sort_player_list(self, player_list, sort_arg):
+
         if sort_arg == "ranking":
             return sorted(player_list, key=lambda x: x[sort_arg], reverse=True)
         else:
@@ -115,6 +118,10 @@ class PlayerController:
         self.round_data = self.round_model.get_last_round_by_id(self.tournament_object.rounds)
 
         for player in self.round_data[0]["list_of_completed_matchs"]:
+
+            # TODO: put everything related to player_1 in loop in one functional block in the loop
+            # TODO: put everything related to player_2 in loop in other functional block in the loop
+
             player_1_id = player[0][0]
             player_1_score = player[0][1]
             player_1_data = self.player_model.get_player_by_id(player_1_id)
