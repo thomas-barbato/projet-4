@@ -1,9 +1,10 @@
-"""import"""
-from .screen_and_sys_func import clear_screen
-from .validation import display_error
-from rich import print, pretty
+"""Display main menu, used within main_controller"""
+from rich import pretty, print
 from rich.console import Console
 from rich.panel import Panel
+
+from .screen_and_sys_func import clear_screen
+from .validation import display_error
 
 
 class TournamentMenu:

@@ -1,14 +1,17 @@
-"""import"""
-from .validation import display_error, check_date_format
-from .screen_and_sys_func import clear_screen
-from views.create_player_view import CreatePlayer
-from views.play_match_view import Playmatch
-from controllers.tournament_controller import TournamentController
-from models.tables import Tournament
+"""Display tournament creation view"""
+import re
+
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-import re
+
+from controllers.tournament_controller import TournamentController
+from models.tables import Tournament
+from views.create_player_view import CreatePlayer
+from views.play_match_view import Playmatch
+
+from .screen_and_sys_func import clear_screen
+from .validation import check_date_format, display_error
 
 
 class CreateTournament:

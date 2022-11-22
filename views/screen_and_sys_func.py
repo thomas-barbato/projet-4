@@ -1,4 +1,4 @@
-"""import"""
+"""Used to clean screen and exit to console."""
 import os
 from time import sleep
 

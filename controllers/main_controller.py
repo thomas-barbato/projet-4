@@ -1,11 +1,13 @@
-from views.menu import TournamentMenu
-from views.screen_and_sys_func import exit_to_console
+"""Check user's choice and redirect to views"""
+from rich.console import Console
+
 from views.create_player_view import CreatePlayer
 from views.create_tournament_view import CreateTournament
-from views.display_tournaments import DisplayTournaments
-from views.display_tournament_reports import TournamentReports
 from views.display_players import DisplayPlayers
-from rich.console import Console
+from views.display_tournament_reports import TournamentReports
+from views.display_tournaments import DisplayTournaments
+from views.menu import TournamentMenu
+from views.screen_and_sys_func import exit_to_console
 
 
 class MainController:

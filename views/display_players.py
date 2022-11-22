@@ -1,11 +1,13 @@
-"""import"""
-from .validation import display_error
-from .screen_and_sys_func import clear_screen
-from controllers.player_controller import PlayerController
-from models.tables import Player
+"""Display all players registred and allow to change ranks."""
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+
+from controllers.player_controller import PlayerController
+from models.tables import Player
+
+from .screen_and_sys_func import clear_screen
+from .validation import display_error
 
 
 class DisplayPlayers:

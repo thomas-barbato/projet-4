@@ -1,7 +1,8 @@
-"""import"""
-from tinydb import TinyDB, Query
-from models.tables import Tournament, Player, Round
+"""Send tournaments data to views, use models"""
+from tinydb import Query, TinyDB
+
 from controllers.player_controller import PlayerController
+from models.tables import Player, Round, Tournament
 
 
 class TournamentController:

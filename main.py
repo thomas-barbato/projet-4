@@ -1,5 +1,4 @@
 """import"""
-# from controllers.main_controller import MainController
 from controllers.main_controller import MainController
 
 

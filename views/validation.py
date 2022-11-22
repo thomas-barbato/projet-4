@@ -1,4 +1,5 @@
-"""import"""
+"""Used to display error, with rich text features
+and check date format too """
 import datetime
 
 

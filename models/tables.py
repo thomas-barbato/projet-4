@@ -1,7 +1,9 @@
-"""import"""
-from tinydb import TinyDB, Query
+"""Contain Player, Tournament
+Round and Match tables"""
 from datetime import datetime
+
 import pytz
+from tinydb import Query, TinyDB
 
 db = TinyDB("db_chess.json")
 
@@ -37,15 +39,7 @@ class Player(Table):
 
     # allow editing.
     def set_data(self):
-        return {
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "date_of_birth": self.date_of_birth,
-            "gender": self.gender,
-            "ranking": self.ranking,
-            "score": self.score,
-            "id": self.id,
-        }
+        return self.__dict__
 
     # allow to set data in instance
     def unset_data(self, data):
@@ -89,28 +83,30 @@ class Player(Table):
 
     def get_player_by_id(self, id):
         query = db.table("players").search(Query().id == int(id))
+        user = query[0]
         result = {}
-        result["first_name"] = query[0]["first_name"]
-        result["last_name"] = query[0]["last_name"]
-        result["date_of_birth"] = query[0]["date_of_birth"]
-        result["gender"] = query[0]["gender"]
-        result["ranking"] = query[0]["ranking"]
-        result["score"] = query[0]["score"]
-        result["id"] = query[0]["id"]
+        result["first_name"] = user["first_name"]
+        result["last_name"] = user["last_name"]
+        result["date_of_birth"] = user["date_of_birth"]
+        result["gender"] = user["gender"]
+        result["ranking"] = user["ranking"]
+        result["score"] = user["score"]
+        result["id"] = user["id"]
 
         return result
 
     def get_player_name_by_id(self, id):
 
         query = db.table("players").search(Query().id == int(id))
+        user = query[0]
         result = {}
-        result["first_name"] = query[0]["first_name"]
-        result["last_name"] = query[0]["last_name"]
-        result["date_of_birth"] = query[0]["date_of_birth"]
-        result["gender"] = query[0]["gender"]
-        result["ranking"] = query[0]["ranking"]
-        result["score"] = query[0]["score"]
-        result["id"] = query[0]["id"]
+        result["first_name"] = user["first_name"]
+        result["last_name"] = user["last_name"]
+        result["date_of_birth"] = user["date_of_birth"]
+        result["gender"] = user["gender"]
+        result["ranking"] = user["ranking"]
+        result["score"] = user["score"]
+        result["id"] = user["id"]
 
         return f'{result["last_name"]} {result["first_name"]}'
 
@@ -148,18 +144,7 @@ class Tournament(Table):
 
     # allow editing.
     def set_data(self):
-        return {
-            "tournament_name": self.tournament_name,
-            "location": self.location,
-            "tournament_date_begin": self.tournament_date_begin,
-            "tournament_date_end": self.tournament_date_end,
-            "number_of_round": self.number_of_round,
-            "players_choice": self.players_choice,
-            "time_controller_choice": self.time_controller_choice,
-            "description": self.description,
-            "rounds": self.rounds,
-            "id": self.id,
-        }
+        return self.__dict__
 
     # allow to set data in instance
     def unset_data(self, data):
@@ -290,13 +275,8 @@ class Round(Table):
 
     # allow editing.
     def set_data(self):
-        return {
-            "name": self.name,
-            "time_begin": self.time_begin,
-            "time_end": self.time_end,
-            "list_of_completed_matchs": self.list_of_completed_matchs,
-            "id": 0,
-        }
+        self.id = 0
+        return self.__dict__
 
     # allow to set data in instance
     def unset_data(self, data):
@@ -376,12 +356,7 @@ class Match(Table):
 
     # allow editing.
     def set_data(self):
-        return {
-            "player_1": self.player_1,
-            "player_2": self.player_2,
-            "score_player_1": self.score_player_1,
-            "score_player_2": self.score_player_2,
-        }
+        return self.__dict__
 
     # allow to set data in instance
     def unset_data(self):

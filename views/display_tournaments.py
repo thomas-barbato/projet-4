@@ -1,12 +1,14 @@
 """import"""
-from .validation import display_error
-from .screen_and_sys_func import clear_screen
-from .play_match_view import Playmatch
-from .display_tournament_reports import TournamentReports
-from models.tables import Tournament
-from controllers.tournament_controller import TournamentController
 from rich.console import Console
 from rich.table import Table
+
+from controllers.tournament_controller import TournamentController
+from models.tables import Tournament
+
+from .display_tournament_reports import TournamentReports
+from .play_match_view import Playmatch
+from .screen_and_sys_func import clear_screen
+from .validation import display_error
 
 
 class DisplayTournaments:

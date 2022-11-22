@@ -1,14 +1,14 @@
-"""import"""
-from .validation import display_error
-from .screen_and_sys_func import clear_screen
-from controllers.tournament_controller import TournamentController
-from controllers.player_controller import PlayerController
-
-# from views.display_tournaments import DisplayTournaments
-from views.display_tournament_reports import TournamentReports
-from models.tables import Tournament, Match, Round
+"""Contain view wich allow user to register matchs rounds"""
 from rich.console import Console
 from rich.table import Table
+
+from controllers.player_controller import PlayerController
+from controllers.tournament_controller import TournamentController
+from models.tables import Match, Round, Tournament
+from views.display_tournament_reports import TournamentReports
+
+from .screen_and_sys_func import clear_screen
+from .validation import display_error
 
 
 class Playmatch:
@@ -70,8 +70,9 @@ class Playmatch:
                 "un match nul = 0.5 pour les deux participants.\n"
             )
         else:
+            round_remaining = int(self.tournament_object.number_of_round)-round_count
             self.console.print(
-                f"\n[bold]{self.tournament_object.number_of_round-round_count} tours restants.[/bold]\n"
+                f"\n[bold]{round_remaining} tours restants.[/bold]\n"
                 "[bold]Attribution des scores:[/bold]\n"
                 "un match gagné = 1 point\n"
                 "un match perdu = 0 point\n"
@@ -130,10 +131,7 @@ class Playmatch:
         if not response.lower() in ["o", "n"]:
             self.console.print(display_error("wrong_input_choice_to_continue"))
         elif response.lower() == "o":
-            clear_screen(1)
-            self.console.print("[bold]Sauvegarde terminée...[/bold]")
-            self.console.print("\n[bold]vous allez être redirigé vers le menu principal.[/bold]")
-            return
+            return response.lower()
 
     def display_tournament_result(self):
         pass
@@ -200,7 +198,10 @@ class Playmatch:
             # end clock
             self.end_chronometer()
             # save new turn
-            self.save_tournament_current_tour_and_exit()
+            if self.save_tournament_current_tour_and_exit() == "o":
+                self.console.print("[bold]Sauvegarde terminée...[/bold]")
+                self.console.print("\n[bold]vous allez être redirigé vers le menu principal.[/bold]")
+                return
             # clean lists
             self.round_model.NUMBER_OF_TOUR += 1
         self.display_end_tournament()

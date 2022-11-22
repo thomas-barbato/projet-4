@@ -1,7 +1,9 @@
-"""import"""
-from models.tables import Player, Round
-from tinydb import TinyDB, where, Query
+"""Send player's data to views, use models"""
 from operator import attrgetter
+
+from tinydb import Query, TinyDB, where
+
+from models.tables import Player, Round
 
 
 class PlayerController:
@@ -115,13 +117,10 @@ class PlayerController:
         self.round_data = self.round_model.get_last_round_by_id(self.tournament_object.rounds)
 
         for player in self.round_data[0]["list_of_completed_matchs"]:
+            # create new player list
             player_1_id = player[0][0]
             player_1_score = player[0][1]
             player_1_data = self.player_model.get_player_by_id(player_1_id)
-            player_2_id = player[1][0]
-            player_2_score = player[1][1]
-            player_2_data = self.player_model.get_player_by_id(player_2_id)
-            # create new player list
             self.player_objects_list.append(
                 Player(
                     player_1_data["first_name"],
@@ -133,6 +132,9 @@ class PlayerController:
                     player_1_data["id"],
                 )
             )
+            player_2_id = player[1][0]
+            player_2_score = player[1][1]
+            player_2_data = self.player_model.get_player_by_id(player_2_id)
             self.player_objects_list.append(
                 Player(
                     player_2_data["first_name"],

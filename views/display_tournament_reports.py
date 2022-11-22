@@ -1,12 +1,14 @@
 """import"""
-from .validation import display_error
-from .screen_and_sys_func import clear_screen
-from controllers.tournament_controller import PlayerController
-from controllers.tournament_controller import TournamentController
-from models.tables import Player, Tournament, Round
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+
+from controllers.tournament_controller import (PlayerController,
+                                               TournamentController)
+from models.tables import Player, Round, Tournament
+
+from .screen_and_sys_func import clear_screen
+from .validation import display_error
 
 
 class TournamentReports:
@@ -200,7 +202,7 @@ class TournamentReports:
         tournament_table.add_column("Nbr. Round", justify="center", style="white", no_wrap=True)
         tournament_table.add_column("description", justify="center", style="white", no_wrap=True)
         tournament_table.add_row(
-            f"{self.tournament_data.id}",
+            f"[bold]{self.tournament_data.id}[/bold]",
             f"{self.tournament_data.tournament_name}",
             f"{self.tournament_data.location}",
             f"{self.tournament_data.tournament_date_begin}",

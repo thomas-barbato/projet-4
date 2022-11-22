@@ -1,10 +1,12 @@
-"""import"""
-from .validation import display_error, check_birth_date_format
-from .screen_and_sys_func import clear_screen
-from controllers.player_controller import PlayerController
+"""Display player creation view"""
 from rich import print
 from rich.console import Console
 from rich.panel import Panel
+
+from controllers.player_controller import PlayerController
+
+from .screen_and_sys_func import clear_screen
+from .validation import check_birth_date_format, display_error
 
 
 class CreatePlayer:
