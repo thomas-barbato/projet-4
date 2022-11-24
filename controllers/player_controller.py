@@ -134,7 +134,6 @@ class PlayerController:
         self.round_data = self.round_model.get_last_round_by_id(self.tournament_object.rounds)
 
         for player in self.round_data[0]["list_of_completed_matchs"]:
-            print("DEDANS")
             self.add_player_into_match(player[0])
             self.add_player_into_match(player[1])
             # set match played list
