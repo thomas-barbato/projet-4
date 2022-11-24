@@ -109,7 +109,7 @@ class DisplayPlayers:
         response = input(f"Changer le rang de {name}? (o/n): ")
         if not response.lower() in ["o", "n"]:
             self.console.print(display_error("wrong_input_choice_to_confirm"))
-            return self.display_asking_player_rank_change(name)
+            return self.display_asking_player_rank_change(name, id)
         else:
             if response.lower() == "o":
                 clear_screen(0)

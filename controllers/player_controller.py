@@ -106,6 +106,23 @@ class PlayerController:
 
     def sort_player_by_lastname(self):
         return sorted(self.db.table("players").all(), key=lambda d: d["last_name"], reverse=False)
+    
+    def add_player_into_match(self, player):
+        player_id = player[0]
+        player_score = player[1]
+        player_data = self.player_model.get_player_by_id(player_id)
+        self.player_objects_list.append(
+            Player(
+                player_data["first_name"],
+                player_data["last_name"],
+                player_data["date_of_birth"],
+                player_data["gender"],
+                player_data["ranking"],
+                player_score,
+                player_data["id"],
+            )
+        )
+        return player_id
 
     def sort_players_by_score(self, tournament_object):
         self.tournament_object = tournament_object
@@ -117,37 +134,11 @@ class PlayerController:
         self.round_data = self.round_model.get_last_round_by_id(self.tournament_object.rounds)
 
         for player in self.round_data[0]["list_of_completed_matchs"]:
-            # create new player list
-            player_1_id = player[0][0]
-            player_1_score = player[0][1]
-            player_1_data = self.player_model.get_player_by_id(player_1_id)
-            self.player_objects_list.append(
-                Player(
-                    player_1_data["first_name"],
-                    player_1_data["last_name"],
-                    player_1_data["date_of_birth"],
-                    player_1_data["gender"],
-                    player_1_data["ranking"],
-                    player_1_score,
-                    player_1_data["id"],
-                )
-            )
-            player_2_id = player[1][0]
-            player_2_score = player[1][1]
-            player_2_data = self.player_model.get_player_by_id(player_2_id)
-            self.player_objects_list.append(
-                Player(
-                    player_2_data["first_name"],
-                    player_2_data["last_name"],
-                    player_2_data["date_of_birth"],
-                    player_2_data["gender"],
-                    player_2_data["ranking"],
-                    player_2_score,
-                    player_2_data["id"],
-                )
-            )
+            print("DEDANS")
+            self.add_player_into_match(player[0])
+            self.add_player_into_match(player[1])
             # set match played list
-            self.matchs_played.append([player_1_data["id"], player_2_data["id"]])
+            self.matchs_played.append([player[0], player[1]])
         # sort team by score, if score is equal
         # then by ranking
         # reversed
