@@ -89,7 +89,8 @@ class CreateTournament:
         elif response.lower() == "o":
             self.display_create_menu()
         elif response.lower() == "n":
-            return
+            from controllers.main_controller import MainController
+            return MainController().select_menu_choice()
 
     def display_tournament_name(self):
         try:
@@ -286,7 +287,8 @@ class CreateTournament:
                     "\n[bold]Création annulée,[/bold]" "[bold]vous allez être redirigé vers le menu principal.[/bold]"
                 )
                 clear_screen(1)
-                return
+                from controllers.main_controller import MainController
+                return MainController().select_menu_choice()
             return response.lower()
 
     def display_confirm_begin_tournament(self):
@@ -303,5 +305,6 @@ class CreateTournament:
             elif response.lower() == "n":
                 self.console.print("\n[bold]vous allez être redirigé vers le menu principal.[/bold]")
                 clear_screen(1)
-                return
+                from controllers.main_controller import MainController
+                return MainController().select_menu_choice()
             return response.lower()

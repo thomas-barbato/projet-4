@@ -61,7 +61,8 @@ class CreatePlayer:
         elif response.lower() == "o":
             return self.display_player_create_menu()
         elif response.lower() == "n":
-            return
+            from controllers.main_controller import MainController
+            return MainController().select_menu_choice()
 
     def display_player_last_name(self):
         try:
@@ -180,7 +181,8 @@ class CreatePlayer:
                     "\n[bold]Création annulée,[/bold]" "[bold]vous allez être redirigé vers le menu principal.[/bold]"
                 )
                 clear_screen(1)
-                return
+                from controllers.main_controller import MainController
+                return MainController().select_menu_choice()
 
     def display_confirm_create_another_player(self):
         response = input("Inscrire un nouveau joueur ? (o/n): ")
@@ -196,4 +198,5 @@ class CreatePlayer:
                     "\n[bold]Création annulée,[/bold]" "[bold]vous allez être redirigé vers le menu principal.[/bold]"
                 )
                 clear_screen(1)
-                return
+                from controllers.main_controller import MainController
+                return MainController().select_menu_choice()

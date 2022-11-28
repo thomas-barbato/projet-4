@@ -92,7 +92,8 @@ class Playmatch:
         elif response.lower() == "n":
             clear_screen(0)
             self.console.print("\n\n[bold]Vous allez être redirigé vers la page d'accueil.[/bold]\n")
-            return
+            from controllers.main_controller import MainController
+            return MainController().select_menu_choice()
 
     def start_chronometer(self):
         response: str = input("Lancer le chronomètre ? (o/n): ")
@@ -131,10 +132,8 @@ class Playmatch:
         if not response.lower() in ["o", "n"]:
             self.console.print(display_error("wrong_input_choice_to_continue"))
         elif response.lower() == "o":
-            return response.lower()
-
-    def display_tournament_result(self):
-        pass
+            from controllers.main_controller import MainController
+            return MainController().select_menu_choice()
 
     def display_tournament_begin(self):
         clear_screen(0)
