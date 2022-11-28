@@ -129,7 +129,8 @@ class TournamentReports:
         elif action_choice == "2":
             return self.display_tournament_results()
         elif action_choice == "3":
-            return
+            from controllers.main_controller import MainController
+            return MainController().select_menu_choice()
         else:
             self.console.print(display_error("wrong_input_report_display_choice"))
             return self.report_action_choice()
