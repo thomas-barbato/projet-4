@@ -1,8 +1,6 @@
 """Contain Player, Tournament
 Round and Match tables"""
 from datetime import datetime
-import time
-import pdb
 import pytz
 from tinydb import Query, TinyDB
 

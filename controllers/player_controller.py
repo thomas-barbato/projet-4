@@ -106,7 +106,7 @@ class PlayerController:
 
     def sort_player_by_lastname(self):
         return sorted(self.db.table("players").all(), key=lambda d: d["last_name"], reverse=False)
-    
+
     def add_player_into_match(self, player):
         player_id = player[0]
         player_score = player[1]

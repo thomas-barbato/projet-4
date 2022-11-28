@@ -7,7 +7,7 @@ from views.display_players import DisplayPlayers
 from views.display_tournament_reports import TournamentReports
 from views.display_tournaments import DisplayTournaments
 from views.menu import TournamentMenu
-from views.screen_and_sys_func import exit_to_console
+import sys
 
 
 class MainController:
@@ -32,8 +32,8 @@ class MainController:
             self.display_players.display_all_players()
         elif selected == "5":
             self.display_reports.display_reports()
-        if selected == "6":
+        elif selected == "6":
             self.console.print("[italic red]Le programme va maintenant se terminer, à bientot.[/italic red]")
-            exit_to_console(0)
+            sys.exit(0)
         else:
             self.select_menu_choice()
