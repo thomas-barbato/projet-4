@@ -69,7 +69,8 @@ class DisplayPlayers:
             self.display_all_players("ranking")
             self.display_player_menu_choice()
         elif player_select_choice == "4":
-            return
+            from controllers.main_controller import MainController
+            return MainController().select_menu_choice()
         else:
             self.console.print(display_error("wrong_input_player_display_choice"))
             self.display_player_menu_choice()
