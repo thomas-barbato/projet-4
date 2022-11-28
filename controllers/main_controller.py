@@ -32,7 +32,7 @@ class MainController:
             self.display_players.display_all_players()
         elif selected == "5":
             self.display_reports.display_reports()
-        elif selected == "6":
+        if selected == "6":
             self.console.print("[italic red]Le programme va maintenant se terminer, à bientot.[/italic red]")
             sys.exit(0)
         else:
